@@ -4,8 +4,6 @@ public class CannonManager : MonoBehaviour
 {
     public static string cannonTagName = "Cannon";
 
-    [SerializeField] private Camera _sceneCamera;
-
     private CannonMover _cannonMover;
     private CannonMuzzle _cannonMuzzle;
 

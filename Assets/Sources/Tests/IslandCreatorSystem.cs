@@ -1,13 +1,13 @@
-using Unity.Entities;
-using UnityEngine;
+//using Unity.Entities;
+//using UnityEngine;
 
-public class IslandCreatorSystem : SystemBase
-{
-    protected override void OnUpdate()
-    {
-        var entity = GetSingletonEntity<GroundSpawnSettings>();
-        var spawnData = GetComponent<Ground>(entity);
+//public class IslandCreatorSystem : SystemBase
+//{
+//    protected override void OnUpdate()
+//    {
+//        var entity = GetSingletonEntity<GroundSpawnSettings>();
+//        var spawnData = GetComponent<Ground>(entity);
 
-        Debug.Log("IslandCreatorSystem -> spawnData -> " + spawnData);
-    }
-}
+//        Debug.Log("IslandCreatorSystem -> spawnData -> " + spawnData);
+//    }
+//}

@@ -1,13 +1,15 @@
-using System;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
 public class CannonMuzzle : MonoBehaviour
 {
+    public float ImpulseForce = 50f;
+
     public bool IsFireButtonPressed { get; set; }
     public bool IsShootAllowed { get; set; }
+
+    [SerializeField] private TrajectoryPredictionNoECS _trajectoryPrediction;
 
     [Header("Specs")]
     
@@ -21,6 +23,12 @@ public class CannonMuzzle : MonoBehaviour
     private Entity _cannonballEntityPrefab;
 
     private BlobAssetStore _blobAssetStore;
+
+    private Vector3 _currentPosition;
+    private Quaternion _currentQuaternion;
+    private Vector3 _predictedPosition;
+
+    [SerializeField] private CameraController _cameraController;
     
     protected virtual void Start()
     {
@@ -30,15 +38,31 @@ public class CannonMuzzle : MonoBehaviour
 
         var settings = GameObjectConversionSettings.FromWorld(currentWorld, _blobAssetStore = new BlobAssetStore());
         _cannonballEntityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(_cannonballPrefab, settings);
+
+        _currentPosition = transform.position;
+        _currentQuaternion = transform.rotation;
+
+        _predictedPosition = Predict();
     }
 
-    // Update is called once per frame
     protected virtual void Update()
     {
         if (GameManager.IsGameOver())
         {
             return;
         }
+
+        if (_currentPosition != transform.transform.position && !GameManager.IsFireState())
+        {
+            _predictedPosition = Predict();
+        }
+
+        if (_currentQuaternion != transform.rotation && !GameManager.IsFireState())
+        {
+            _predictedPosition = Predict();
+        }
+
+        _currentQuaternion = transform.rotation;
 
         //if (IsShootAllowed && IsFireButtonPressed)
         //{
@@ -47,7 +71,9 @@ public class CannonMuzzle : MonoBehaviour
 
         if (IsFireButtonPressed)
         {
+            GameManager.StartFireState();
             FireCannonball();
+            _cameraController.SetCameraPosition(CameraPosition.Cannonball, _muzzleTransform.forward - _muzzleTransform.position);
         }
     }
 
@@ -59,20 +85,21 @@ public class CannonMuzzle : MonoBehaviour
     public virtual void FireCannonball()
     {
         var cannonBallEntity = _entityManager.Instantiate(_cannonballEntityPrefab);
-
+        
+        _entityManager.SetName(cannonBallEntity, $"Cannonball-{cannonBallEntity.Index}");
         _entityManager.SetComponentData(cannonBallEntity, new Translation { Value = _muzzleTransform.position});
         _entityManager.SetComponentData(cannonBallEntity, new Rotation { Value = _muzzleTransform.rotation });
-
-        var side1 = Vector3.right - _muzzleTransform.position;
-        var side2 = Vector3.forward - _muzzleTransform.position;
-
-        Debug.Log("side 1: " + side1 + "side 2: " + side2 + "Cross: " + Vector3.Cross(side1, side2));
-
+        _entityManager.AddComponentData(cannonBallEntity, new CannonballTag());
         _entityManager.AddComponentData(cannonBallEntity, new CannonShootData
         {
-            Direction = Camera.main.transform.forward,
-            //Extraer Force a un authoring component
-            Force = 50f
+            Direction = _muzzleTransform.forward,
+            Force = ImpulseForce,
+            PredictedPosition = _predictedPosition
         });
+    }
+
+    private Vector3 Predict()
+    {
+       return _trajectoryPrediction.Predict(_cannonballPrefab, _muzzleTransform.position, _muzzleTransform.forward * ImpulseForce);
     }
 }

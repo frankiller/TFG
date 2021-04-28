@@ -6,8 +6,8 @@ public class CannonMover : MonoBehaviour
     [Flags] public enum RotationDirection
     {
         None,
-        Horizontal = (1 << 0),
-        Vertical = (1 << 1)
+        Horizontal = 1 << 0,
+        Vertical = 1 << 1
     }
 
     [SerializeField] private Transform _cannonBaseTransform;
@@ -44,10 +44,10 @@ public class CannonMover : MonoBehaviour
 
     public void Start()
     {
-        if (_cannonBaseTransform != null)
-        {
-            _cannonBaseTransform.parent = null;
-        }
+        //if (_cannonBaseTransform != null)
+        //{
+        //    _cannonBaseTransform.parent = null;
+        //}
     }
 
     public void AimAtMousePosition()

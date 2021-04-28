@@ -7,6 +7,7 @@ public enum GameState
     Ready,
     Starting,
     Playing,
+    Shooting,
     Over
 }
 
@@ -81,7 +82,28 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null) { return Vector3.zero; }
 
-        return (Instance._cannon != null) ? GameManager.Instance._cannon.position : Vector3.zero;
+        return Instance._cannon != null ? GameManager.Instance._cannon.position : Vector3.zero;
+    }
+
+    public static Transform GetCannonTransform()
+    {
+        if (Instance == null) { return new RectTransform();}
+
+        return Instance._cannon != null ? Instance._cannon : new RectTransform();
+    }
+
+    public static void StartFireState()
+    {
+        if (Instance == null) { return; }
+
+        Instance._gameState = GameState.Shooting;
+    }
+
+    public static bool IsFireState()
+    {
+        if (Instance == null) { return false; }
+
+        return Instance._gameState == GameState.Shooting;
     }
 
     public static void EndGame()

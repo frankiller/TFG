@@ -44,7 +44,7 @@ public class IslandSpawnerAuthoring : SpawnObjectAuthoring<GroundSpawnSettings>
     }
 }
 
-[UpdateAfter(typeof(CannonBallSpawnerSystem))]
+[UpdateBefore(typeof(CannonShootSystem))]
 public class IslandSpawnerSystem : SpawnObjectSystemBase<GroundSpawnSettings>
 {
     public override void Create(GroundSpawnSettings spawnSettings)
@@ -68,7 +68,5 @@ public class IslandSpawnerSystem : SpawnObjectSystemBase<GroundSpawnSettings>
         CreatedColliders.Add(boxCollider);
 
         CreateStaticBody(boxCollider, spawnData.Position, spawnData.Orientation);
-
-        EntityManager.RemoveComponent(entity, typeof(Ground));
     }
 }
