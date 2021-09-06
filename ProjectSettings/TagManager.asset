@@ -5,12 +5,13 @@ TagManager:
   serializedVersion: 2
   tags:
   - Cannon
-  - CannonballCamera
+  - Target
+  - Prefabs
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - Target
   - Water
   - UI
   - 

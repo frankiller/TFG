@@ -11,13 +11,15 @@ public enum GameState
     Over
 }
 
+[RequireComponent(typeof(CameraController))]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    public static CameraController CameraController;
 
     [SerializeField] private float delay = 2f;
 
-    private Transform _cannon;
+    //private Transform _cannon;
     //Referencia al script de spawneo de bolas
 
     private GameState _gameState;
@@ -33,7 +35,9 @@ public class GameManager : MonoBehaviour
             Instance = this;
         }
 
-        _cannon = FindObjectOfType<CannonManager>().transform;
+        CameraController = GetComponent<CameraController>();
+
+        //_cannon = FindObjectOfType<CannonManager>().transform;
         //Instancia al script de spawneo de bolas
 
         _gameState = GameState.Ready;
@@ -49,21 +53,23 @@ public class GameManager : MonoBehaviour
     {
         yield return StartGameRoutine();
         yield return PlayGameRoutine();
+        yield return EndGameRoutine();
     }
 
     private IEnumerator StartGameRoutine()
     {
-        CannonManager.EnableCannon(true);
-
-        //Instanciar primera isla y cañon
-
+        //Instanciar primera isla
+        
         yield return new WaitForSeconds(delay);
+        
         _gameState = GameState.Playing;
     }
 
     private IEnumerator PlayGameRoutine()
     {
-        while (_gameState == GameState.Playing)
+        Debug.Log("Starting to Play!");
+
+        while (_gameState == GameState.Playing || _gameState == GameState.Shooting)
         {
             yield return null;
         }
@@ -75,21 +81,37 @@ public class GameManager : MonoBehaviour
 
         _gameState = GameState.Ready;
 
+        Debug.Log("EndGame");
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public static Vector3 GetCannonPosition()
-    {
-        if (Instance == null) { return Vector3.zero; }
+    //public static Vector3 GetCannonPosition()
+    //{
+    //    if (Instance == null) { return Vector3.zero; }
 
-        return Instance._cannon != null ? GameManager.Instance._cannon.position : Vector3.zero;
+    //    return Instance._cannon != null ? GameManager.Instance._cannon.position : Vector3.zero;
+    //}
+
+    //public static Transform GetCannonTransform()
+    //{
+    //    if (Instance == null) { return new RectTransform(); }
+
+    //    return Instance._cannon != null ? Instance._cannon : new RectTransform();
+    //}
+
+    public static bool IsStartingState()
+    {
+        if (Instance == null) { return false; }
+
+        return Instance._gameState == GameState.Starting;
     }
 
-    public static Transform GetCannonTransform()
+    public static bool IsPlayState()
     {
-        if (Instance == null) { return new RectTransform();}
+        if (Instance == null) { return false; }
 
-        return Instance._cannon != null ? Instance._cannon : new RectTransform();
+        return Instance._gameState == GameState.Playing;
     }
 
     public static void StartFireState()
@@ -110,6 +132,7 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null) { return; }
 
+        CameraController.ResetCameraPosition();
         CannonManager.EnableCannon(false);
         Instance._gameState = GameState.Over;
     }
