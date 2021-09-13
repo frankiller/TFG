@@ -14,12 +14,12 @@ public class IslandCreatorSystem : SystemBase
         base.OnCreate();
 
         _islandSpawnerSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<IslandSpawnerSystem>();
-        _cannonShootDataQuery = GetEntityQuery(new ComponentType [] { typeof(CannonShootData) , typeof(IsCorrect)});
+        _cannonShootDataQuery = GetEntityQuery(new ComponentType [] { typeof(CannonShootData) , typeof(IsCorrectTag)});
     }
 
     protected override void OnUpdate()
     {
-        if (_cannonShootDataQuery.CalculateEntityCount() == 0) {return;}
+        if (_cannonShootDataQuery.CalculateEntityCount() == 0) return;
 
         var groundSpawnSettingsEntity = GetSingletonEntity<GroundSpawnSettings>();
         var spawnData = GetComponent<Ground>(groundSpawnSettingsEntity);

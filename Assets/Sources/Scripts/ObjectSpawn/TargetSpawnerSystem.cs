@@ -4,9 +4,6 @@ using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
 
-public struct TargetTag : IComponentData {}
-public struct IsCorrect : IComponentData {}
-
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(BuildPhysicsWorld))]
 public class TargetSpawnerSystem : SystemBase
@@ -46,7 +43,7 @@ public class TargetSpawnerSystem : SystemBase
 
             if (operationAnswer.IsCorrect)
             {
-                _entityManager.AddComponentData(newTarget, new IsCorrect());
+                _entityManager.AddComponentData(newTarget, new IsCorrectTag());
             }
 
             _entityManager.RemoveComponent<OperationAnswer>(entity);

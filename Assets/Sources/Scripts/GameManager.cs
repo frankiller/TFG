@@ -8,7 +8,8 @@ public enum GameState
     Starting,
     Playing,
     Shooting,
-    Over
+    Landing,
+    GameOver
 }
 
 [RequireComponent(typeof(CameraController))]
@@ -128,19 +129,33 @@ public class GameManager : MonoBehaviour
         return Instance._gameState == GameState.Shooting;
     }
 
+    public static void StartLandingState()
+    {
+        if (Instance == null) { return; }
+
+        Instance._gameState = GameState.Landing;
+    }
+
+    public static bool IsLandingState()
+    {
+        if (Instance == null) { return false; }
+
+        return Instance._gameState == GameState.Landing;
+    }
+
     public static void EndGame()
     {
         if (Instance == null) { return; }
 
         CameraController.ResetCameraPosition();
         CannonManager.EnableCannon(false);
-        Instance._gameState = GameState.Over;
+        Instance._gameState = GameState.GameOver;
     }
 
     public static bool IsGameOver()
     {
         if (Instance == null) { return false; }
 
-        return Instance._gameState == GameState.Over;
+        return Instance._gameState == GameState.GameOver;
     }
 }

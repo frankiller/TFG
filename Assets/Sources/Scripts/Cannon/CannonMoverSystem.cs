@@ -66,8 +66,7 @@ public class CannonMoverSystem : SystemBase
         _cannonEntityQuery = GetEntityQuery(typeof(CannonTag));
         _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        var inputEntity = GetSingletonEntity<InputVariables>();
-        var inputVariables = GetComponent<InputVariables>(inputEntity);
+        var inputVariables = GetComponent<InputVariables>(GetSingletonEntity<InputVariables>());
         _turnSpeed = inputVariables.TurnSpeed;
         _acceleration = inputVariables.Acceleration;
         _maxVerticalAngle = inputVariables.MaxVerticalAngle;

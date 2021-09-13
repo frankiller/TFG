@@ -13,8 +13,6 @@ public struct Ground : IComponentData
     public float Restitution;
 }
 
-public struct GroundTag : IComponentData { }
-
 public class GroundSpawnSettings : SpawnSettings { }
 
 public class IslandSpawnerAuthoring : SpawnObjectAuthoring<GroundSpawnSettings>
@@ -67,6 +65,7 @@ public class IslandSpawnerSystem : SpawnObjectSystemBase<GroundSpawnSettings>
 
         CreatedColliders.Add(boxCollider);
 
-        CreateStaticBody(boxCollider, spawnData.Position, spawnData.Orientation);
+        var createdIsland = CreateStaticBody(boxCollider, spawnData.Position, spawnData.Orientation);
+        EntityManager.AddComponentData(createdIsland, new GroundTag());
     }
 }

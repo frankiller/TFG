@@ -4,6 +4,8 @@ using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
+using Material = Unity.Physics.Material;
+using SphereCollider = Unity.Physics.SphereCollider;
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(EndFramePhysicsSystem))]
@@ -36,7 +38,7 @@ public class CannonMuzzleSystem : SystemBase
         _buildPhysicsSystem = currentWorld.GetOrCreateSystem<BuildPhysicsWorld>();
         _entityManager = currentWorld.EntityManager;
 
-        _trajectoryPrediction = ScriptableObject.CreateInstance<TrajectoryPredictionNoECS>();
+        
         _muzzleTransform = Camera.main.transform;
         _cannonballPrefab = Resources.Load("Prefabs/CannonballNoECS") as GameObject;
 
@@ -44,9 +46,16 @@ public class CannonMuzzleSystem : SystemBase
         _cannonballEntityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(_cannonballPrefab, settings);
     }
 
+    protected override void OnStartRunning()
+    {
+        base.OnStartRunning();
+
+        _trajectoryPrediction = ScriptableObject.CreateInstance<TrajectoryPredictionNoECS>();
+    }
+
     protected override void OnUpdate()
     {
-        if (GameManager.IsGameOver()) { return; }
+        if (GameManager.IsGameOver() || !GameManager.IsPlayState()) { return; }
 
         _currentPosition = CannonManager.GetCannonBarrelPosition();
         _currentRotation = CannonManager.GetCannonBarrelRotation();
@@ -54,7 +63,6 @@ public class CannonMuzzleSystem : SystemBase
         if (math.all(_currentPosition != _lastPosition) && !GameManager.IsFireState())
         {
             _predictedTrajectory = PredictTrajectory();
-            SimulatePhysics();
         }
 
         _lastPosition = _currentPosition;
@@ -62,18 +70,9 @@ public class CannonMuzzleSystem : SystemBase
         if (!_currentRotation.Equals(_lastRotation) && !GameManager.IsFireState())
         {
             _predictedTrajectory = PredictTrajectory();
-            SimulatePhysics();
         }
 
         _lastRotation = _currentRotation;
-
-        //_predictedTrajectory = _trajectoryPrediction.Predict(_cannonballPrefab, _muzzleTransform.position,_muzzleTransform.forward * 50f);
-        
-
-        //if(math.all(_lastPrediction != _predictedTrajectory))
-        //    Debug.Log("Predicted position " + _predictedTrajectory);
-
-        //_lastPrediction = _predictedTrajectory;
 
         //Se puede sacar de forma que en otro sistema se detecte la pulsación
         Entities.WithoutBurst().ForEach((in InputData inputData) =>
@@ -99,13 +98,25 @@ public class CannonMuzzleSystem : SystemBase
         _entityManager.AddComponentData(cannonBallEntity, new CannonShootData
         {
             Direction = _muzzleTransform.forward,
-            Force = 100f, //Aplicar ImpulseForce desde InputVariables
+            Force = 150f, //Aplicar ImpulseForce desde InputVariables
             PredictedPosition = _predictedTrajectory
+        });
+
+        _entityManager.AddComponentData(cannonBallEntity, new PhysicsCollider
+        {
+            Value = SphereCollider.Create(new SphereGeometry
+            {
+                Center = 0f,
+                Radius = 0.5f
+            }, CollisionFilter.Default, new Material
+            {
+                CollisionResponse = CollisionResponsePolicy.CollideRaiseCollisionEvents
+            })
         });
 
         if (IsTargetCorrectAnswer())
         {
-            _entityManager.AddComponentData(cannonBallEntity, new IsCorrect());
+            _entityManager.AddComponentData(cannonBallEntity, new IsCorrectTag());
         }
     }
 
@@ -116,7 +127,7 @@ public class CannonMuzzleSystem : SystemBase
         var input = new RaycastInput
         {
             Start = _muzzleTransform.position,
-            End = _muzzleTransform.forward * 100f, //Aplicar ImpulseForce desde InputVariables
+            End = _muzzleTransform.forward * 150f, //Aplicar ImpulseForce desde InputVariables
             Filter = new CollisionFilter
             {
                 BelongsTo = ~0u,
@@ -126,17 +137,12 @@ public class CannonMuzzleSystem : SystemBase
         };
 
         return collisionWorld.CastRay(input, out var hit)
-               && _entityManager.HasComponent<IsCorrect>(_buildPhysicsSystem.PhysicsWorld.Bodies[hit.RigidBodyIndex].Entity);
+               && _entityManager.HasComponent<IsCorrectTag>(_buildPhysicsSystem.PhysicsWorld.Bodies[hit.RigidBodyIndex].Entity);
     }
 
     private float3 PredictTrajectory()
     {
-        return _trajectoryPrediction.Predict(_cannonballPrefab, _muzzleTransform.position, _muzzleTransform.forward * 100f);
-    }
-
-    private void SimulatePhysics()
-    {
-        _trajectoryPrediction.Simulate();
+        return _trajectoryPrediction.Predict(10f, _muzzleTransform.position, _muzzleTransform.forward * 150f);
     }
 
     protected override void OnDestroy()

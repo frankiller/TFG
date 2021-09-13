@@ -17,10 +17,6 @@ public abstract class SpawnSettings : IComponentData
     public Material Material;
 }
 
-public struct ObjectSpawnedTag : IComponentData { }
-
-public struct ToSpawn : IComponentData { }
-
 public abstract class SpawnObjectAuthoring<T> : MonoBehaviour, IConvertGameObjectToEntity where T : SpawnSettings, new()
 {
     public Material Material;

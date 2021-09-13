@@ -12,8 +12,6 @@ public struct CannonShootData : IComponentData
     public float3 PredictedPosition;
 }
 
-public struct CannonballTag : IComponentData { }
-
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(EndFramePhysicsSystem))]
 public class CannonShootSystem : SystemBase

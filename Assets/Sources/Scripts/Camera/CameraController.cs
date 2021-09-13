@@ -12,8 +12,6 @@ public enum CameraPosition
 public class CameraController : MonoBehaviour
 {
     [SerializeField] private Transform _cameraTransform;
-    [SerializeField] private Vector3 _cannonOffset = Vector3.zero;
-    [SerializeField] private Vector3 _cannonBallOffset = Vector3.zero;
 
     private EntityManager _entityManager;
     private EntityQuery _cannonEntityQuery;

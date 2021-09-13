@@ -130,6 +130,7 @@ public abstract class SpawnObjectSystemBase<T> : SystemBase where T : SpawnSetti
         var colliderComponent = new PhysicsCollider {Value = collider};
         entityManager.SetComponentData(entity, colliderComponent);
 
+
         CreateRenderMeshForCollider(entityManager, entity, collider, _material);
 
         if (isDynamic)
@@ -150,12 +151,6 @@ public abstract class SpawnObjectSystemBase<T> : SystemBase where T : SpawnSetti
                 Linear = 0.01f,
                 Angular = 0.05f
             });
-        }
-
-        //Special Tag to find ground entities debugging
-        if (!isDynamic)
-        {
-            entityManager.AddComponentData(entity, new GroundTag());
         }
 
         return entity;
@@ -195,7 +190,7 @@ public abstract class SpawnObjectSystemBase<T> : SystemBase where T : SpawnSetti
 
     public void Conversion()
     {
-        var meshConversionSytem = World.GetOrCreateSystem<MeshRendererConversion>();
+        var meshConversionSystem = World.GetOrCreateSystem<MeshRendererConversion>();
         
     }
 }

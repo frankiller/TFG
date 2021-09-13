@@ -123,7 +123,7 @@
 
 //        if (IsTargetCorrectAnswer())
 //        {
-//            _entityManager.AddComponentData(cannonBallEntity, new IsCorrect());
+//            _entityManager.AddComponentData(cannonBallEntity, new IsCorrectTag());
 //        }
 //    }
 
@@ -144,7 +144,7 @@
 //        };
 
 //        return collisionWorld.CastRay(input, out var hit) 
-//               && _entityManager.HasComponent<IsCorrect>(_buildPhysicsSystem.PhysicsWorld.Bodies[hit.RigidBodyIndex].Entity);
+//               && _entityManager.HasComponent<IsCorrectTag>(_buildPhysicsSystem.PhysicsWorld.Bodies[hit.RigidBodyIndex].Entity);
 //    }
 
 //    private Vector3 Predict()
