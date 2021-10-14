@@ -70,7 +70,7 @@ public class CannonMover : ScriptableObject
 
         _inputLagTimer = 0f;
 
-        _currentZEulerRotation = CannonManager.GetCannonBarrelRotation().value.z;
+        _currentZEulerRotation = CannonManager.GetCannonBarrelRotation().value.x;
 
         if (_currentZEulerRotation >= 180)
         {

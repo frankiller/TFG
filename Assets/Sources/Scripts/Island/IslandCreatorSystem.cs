@@ -7,31 +7,31 @@ using Unity.Physics.Systems;
 public class IslandCreatorSystem : SystemBase
 {
     private IslandSpawnerSystem _islandSpawnerSystem;
-    private EntityQuery _cannonShootDataQuery;
+    private EntityQuery _positionPredictionDataQuery;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
         _islandSpawnerSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<IslandSpawnerSystem>();
-        _cannonShootDataQuery = GetEntityQuery(new ComponentType [] { typeof(CannonShootData) , typeof(IsCorrectTag)});
+        _positionPredictionDataQuery = GetEntityQuery(typeof(PositionPredictionData), typeof(IsCorrectTag));
+
+        RequireForUpdate(_positionPredictionDataQuery);
     }
 
     protected override void OnUpdate()
     {
-        if (_cannonShootDataQuery.CalculateEntityCount() == 0) return;
+        var islandSpawnerEntity = GetSingletonEntity<GroundSpawnSettings>();
+        var spawnData = GetComponent<Ground>(islandSpawnerEntity);
 
-        var groundSpawnSettingsEntity = GetSingletonEntity<GroundSpawnSettings>();
-        var spawnData = GetComponent<Ground>(groundSpawnSettingsEntity);
-
-        using var entities = _cannonShootDataQuery.ToEntityArray(Allocator.TempJob);
+        using var entities = _positionPredictionDataQuery.ToEntityArray(Allocator.TempJob);
         foreach (var entity in entities)
         {
-            var cannonShootData = EntityManager.GetComponentData<CannonShootData>(entity);
+            var positionPredictionData = GetComponent<PositionPredictionData>(entity);
 
-            EntityManager.AddComponentData(groundSpawnSettingsEntity, new Ground
+            EntityManager.SetComponentData(islandSpawnerEntity, new Ground
             {
-                Position = cannonShootData.PredictedPosition,
+                Position = positionPredictionData.PredictedPosition,
                 Orientation = spawnData.Orientation,
                 Size = spawnData.Size,
                 BevelRadius = spawnData.BevelRadius,
@@ -41,6 +41,8 @@ public class IslandCreatorSystem : SystemBase
             });
 
             _islandSpawnerSystem.Create(null);
+
+            EntityManager.RemoveComponent<PositionPredictionData>(entity);
         }
     }
 }

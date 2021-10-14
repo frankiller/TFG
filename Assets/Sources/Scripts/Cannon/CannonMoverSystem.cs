@@ -11,8 +11,8 @@ public class CannonMoverSystem : SystemBase
     private EntityQuery _cannonEntityQuery;
     private EntityManager _entityManager;
 
-    private float2 _turnSpeed;
-    private float2 _acceleration;
+    private float _turnSpeed;
+    private float _acceleration;
     private float _maxVerticalAngle;
     private float _inputLagPeriod;
 
@@ -24,9 +24,9 @@ public class CannonMoverSystem : SystemBase
     private float _currentYVelocity;
     private float _currentYRotation;
 
-    private float _currentZVelocity;
-    private float _currentZRotation;
-    private float _currentZEulerRotation;
+    private float _currentXVelocity;
+    private float _currentXRotation;
+    private float _currentXEulerRotation;
 
     private float GetXInput
     {
@@ -73,61 +73,71 @@ public class CannonMoverSystem : SystemBase
         _inputLagPeriod = inputVariables.InputLagPeriod;
 
         _currentYVelocity = 0f;
-        _currentZVelocity = 0f;
+        _currentXVelocity = 0f;
         
         _lastXInputEvent = 0f;
         _lastYInputEvent = 0f;
 
         _inputLagTimer = 0f;
 
-        _currentZEulerRotation = CannonManager.GetCannonBarrelRotation().value.z;
+        //_currentXEulerRotation = CannonManager.GetCannonBarrelRotation().value.x;
+        var barrelRotation = CannonManager.GetCannonBarrelRotation().value;
+        _currentXEulerRotation = new Quaternion(barrelRotation.x, barrelRotation.y, barrelRotation.z, barrelRotation.w).eulerAngles.x;
 
-        if (_currentZEulerRotation >= 180)
+        if (_currentXEulerRotation >= 180)
         {
-            _currentZEulerRotation -= 360;
+            _currentXEulerRotation -= 360;
         }
 
-        _currentZEulerRotation = ClampVerticalAngle(_currentZEulerRotation);
+        _currentXEulerRotation = ClampVerticalAngle(_currentXEulerRotation);
 
         _currentYRotation = CannonManager.GetCannonBarrelRotation().value.y;
-        _currentZRotation = _currentZEulerRotation;
+        _currentXRotation = _currentXEulerRotation;
     }
 
     protected override void OnUpdate()
     {
         var entity = _cannonEntityQuery.GetSingletonEntity();
         var linkedEntityGroup = GetBuffer<LinkedEntityGroup>(entity);
+        var yRotation = GetYRotationToMouse();
         
         var baseEntity = linkedEntityGroup[1].Value;
-        _entityManager.SetComponentData(baseEntity, new Rotation{ Value = GetYRotationToMouse() * Quaternion.Euler(-90f, 0f, 0f)});
-        
+        //_entityManager.SetComponentData(baseEntity, new Rotation { Value = GetYRotationToMouse() });
+        var fromRotation = _entityManager.GetComponentData<Rotation>(baseEntity).Value;
+        var toRotation = quaternion.Euler(0f, yRotation, 0f);
+        _entityManager.SetComponentData(baseEntity, new Rotation { Value = Quaternion.Lerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
+
         var barrelEntity = linkedEntityGroup[2].Value;
-        _entityManager.SetComponentData(barrelEntity, new Rotation { Value = GetYRotationToMouse() * Quaternion.Euler(0f, 0f, 90f) * GetZRotationToMouse()});
+        //_entityManager.SetComponentData(barrelEntity, new Rotation { Value = GetXRotationToMouse() * GetYRotationToMouse() });
+        fromRotation = _entityManager.GetComponentData<Rotation>(barrelEntity).Value;
+        toRotation = quaternion.Euler(GetXRotationToMouse(), yRotation, 0f);
+        _entityManager.SetComponentData(barrelEntity, new Rotation { Value = Quaternion.Lerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
     }
 
-    private Quaternion GetYRotationToMouse()
+    private float GetYRotationToMouse()
     {
-        var wantedVelocity = GetXInput * _turnSpeed.x;
-        _currentYVelocity = Mathf.MoveTowards(_currentYVelocity, wantedVelocity, _acceleration.x * Time.DeltaTime);
+        var wantedVelocity = GetXInput * _turnSpeed;
+        _currentYVelocity = Mathf.MoveTowards(_currentYVelocity, wantedVelocity, _acceleration * Time.DeltaTime);
 
         _currentYRotation += _currentYVelocity * Time.DeltaTime;
 
-        return Quaternion.Euler(0f, _currentYRotation, 0f);
+        return _currentYRotation;
     }
 
-    private Quaternion GetZRotationToMouse()
+    private float GetXRotationToMouse()
     {
-        var wantedVelocity = GetYInput * _turnSpeed.y;
-        _currentZVelocity = Mathf.MoveTowards(_currentZVelocity, wantedVelocity, _acceleration.y * Time.DeltaTime);
+        var wantedVelocity = GetYInput * _turnSpeed;
+        _currentXVelocity = Mathf.MoveTowards(_currentXVelocity, wantedVelocity, _acceleration * Time.DeltaTime);
 
-        _currentZRotation += _currentZVelocity * Time.DeltaTime;
-        _currentZRotation = ClampVerticalAngle(_currentZRotation);
+        _currentXRotation -= _currentXVelocity * Time.DeltaTime;
+        _currentXRotation = ClampVerticalAngle(_currentXRotation);
 
-        return Quaternion.Euler(0f, 0f, -_currentZRotation);
+        return _currentXRotation;
     }
 
-    private float ClampVerticalAngle(float angle)
+    private float ClampVerticalAngle(float value)
     {
-        return math.clamp(angle, -_maxVerticalAngle, _maxVerticalAngle);
+        var maxRadiansAngle = _maxVerticalAngle * Mathf.Deg2Rad;
+        return math.clamp(value, -maxRadiansAngle, maxRadiansAngle);
     }
 }

@@ -12,18 +12,25 @@ public class CheckCollisionOnIslandSystem : JobComponentSystem
     private BuildPhysicsWorld _buildPhysicsWorld;
     private StepPhysicsWorld _stepPhysicsWorld;
 
+    private EndFixedStepSimulationEntityCommandBufferSystem _endFixedStepSimulationEntityCommandBuffer;
+
     protected override void OnCreate()
     {
         base.OnCreate();
         _buildPhysicsWorld = World.GetOrCreateSystem<BuildPhysicsWorld>();
         _stepPhysicsWorld = World.GetOrCreateSystem<StepPhysicsWorld>();
+
+        _endFixedStepSimulationEntityCommandBuffer = World.GetOrCreateSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
     }
 
     [BurstCompile]
     struct CheckCollisionOnIslandSystemJob : ICollisionEventsJob
     {
         [ReadOnly] public ComponentDataFromEntity<GroundTag> GroundGroup;
-        public ComponentDataFromEntity<CannonballTag> CannonballGroup;
+        [ReadOnly] public ComponentDataFromEntity<CannonballTag> CannonballGroup;
+        [ReadOnly] public ComponentDataFromEntity<CannonballOnGroundTag> CannonballOnGroundGroup;
+
+        public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
 
         public void Execute(CollisionEvent collisionEvent)
         {
@@ -32,15 +39,18 @@ public class CheckCollisionOnIslandSystem : JobComponentSystem
 
             bool entityAIsCannonball = CannonballGroup.HasComponent(entityA);
             bool entityAIsGround = GroundGroup.HasComponent(entityA);
+            bool entityAIsProcessed = CannonballOnGroundGroup.HasComponent(entityA);
+            
             bool entityBIsCannonball = CannonballGroup.HasComponent(entityB);
             bool entityBIsGround = GroundGroup.HasComponent(entityB);
+            bool entityBIsProcessed = CannonballOnGroundGroup.HasComponent(entityB);
 
-            if (entityAIsCannonball && entityBIsGround)
+            if (entityAIsCannonball && entityBIsGround && !entityAIsProcessed)
             {
-                UnityEngine.Debug.Log("Entity A is cannonball and Entity B is ground");
+                EntityCommandBuffer.AddComponent(entityA.Index, entityA, new CannonballOnGroundTag());
             }
 
-            if (entityBIsCannonball && entityAIsGround)
+            if (entityBIsCannonball && entityAIsGround && !entityBIsProcessed)
             {
                 UnityEngine.Debug.Log("Entity A is ground and Entity B is cannonball");
             }
@@ -52,11 +62,16 @@ public class CheckCollisionOnIslandSystem : JobComponentSystem
         var job = new CheckCollisionOnIslandSystemJob
         {
             GroundGroup = GetComponentDataFromEntity<GroundTag>(true),
-            CannonballGroup = GetComponentDataFromEntity<CannonballTag>()
+            CannonballGroup = GetComponentDataFromEntity<CannonballTag>(true),
+            CannonballOnGroundGroup = GetComponentDataFromEntity<CannonballOnGroundTag>(true),
+            EntityCommandBuffer = _endFixedStepSimulationEntityCommandBuffer.CreateCommandBuffer().AsParallelWriter()
         };
-
+        
         var jobHandle = job.Schedule(_stepPhysicsWorld.Simulation, ref _buildPhysicsWorld.PhysicsWorld, inputDeps);
-        jobHandle.Complete();
+        
+        _buildPhysicsWorld.AddInputDependencyToComplete(jobHandle);
+
+        _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(jobHandle);
 
         return jobHandle;
     }

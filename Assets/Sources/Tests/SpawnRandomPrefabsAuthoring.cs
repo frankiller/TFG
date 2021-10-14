@@ -80,34 +80,32 @@ abstract class SpawnRandomPrefabsSystemBase<T> : SystemBase where T : struct, IC
     protected override void OnUpdate()
     {
         // Entities.ForEach in generic system types are not supported
-        using (var entities = GetEntityQuery(new ComponentType[] { typeof(T) }).ToEntityArray(Allocator.TempJob))
+        using var entities = GetEntityQuery(typeof(T)).ToEntityArray(Allocator.TempJob);
+        for (int j = 0; j < entities.Length; j++)
         {
-            for (int j = 0; j < entities.Length; j++)
+            var entity = entities[j];
+            var spawnSettings = EntityManager.GetComponentData<T>(entity);
+
+            var count = spawnSettings.Count;
+
+            OnBeforeInstantiatePrefab(ref spawnSettings);
+
+            var instances = new NativeArray<Entity>(count, Allocator.Temp);
+            EntityManager.Instantiate(spawnSettings.Prefab, instances);
+
+            var positions = new NativeArray<float3>(count, Allocator.Temp);
+            var rotations = new NativeArray<quaternion>(count, Allocator.Temp);
+            RandomPointsInRange(spawnSettings.Position, spawnSettings.Rotation, spawnSettings.Range, ref positions, ref rotations, GetRandomSeed(spawnSettings));
+
+            for (int i = 0; i < count; i++)
             {
-                var entity = entities[j];
-                var spawnSettings = EntityManager.GetComponentData<T>(entity);
-
-                var count = spawnSettings.Count;
-
-                OnBeforeInstantiatePrefab(ref spawnSettings);
-
-                var instances = new NativeArray<Entity>(count, Allocator.Temp);
-                EntityManager.Instantiate(spawnSettings.Prefab, instances);
-
-                var positions = new NativeArray<float3>(count, Allocator.Temp);
-                var rotations = new NativeArray<quaternion>(count, Allocator.Temp);
-                RandomPointsInRange(spawnSettings.Position, spawnSettings.Rotation, spawnSettings.Range, ref positions, ref rotations, GetRandomSeed(spawnSettings));
-
-                for (int i = 0; i < count; i++)
-                {
-                    var instance = instances[i];
-                    EntityManager.SetComponentData(instance, new Translation { Value = positions[i] });
-                    EntityManager.SetComponentData(instance, new Rotation { Value = rotations[i] });
-                    ConfigureInstance(instance, ref spawnSettings);
-                }
-
-                EntityManager.RemoveComponent<T>(entity);
+                var instance = instances[i];
+                EntityManager.SetComponentData(instance, new Translation { Value = positions[i] });
+                EntityManager.SetComponentData(instance, new Rotation { Value = rotations[i] });
+                ConfigureInstance(instance, ref spawnSettings);
             }
+
+            EntityManager.RemoveComponent<T>(entity);
         }
     }
 

@@ -93,7 +93,7 @@
 
 //        GameManager.StartFireState();
 //        FireCannonball();
-//        GameManager.CameraController.SetCameraPosition(CameraPosition.Cannonball, _muzzleTransform.forward - _muzzleTransform.position);
+//        GameManager.CameraController.SetCameraPosition(CameraPositionNoEcs.Cannonball, _muzzleTransform.forward - _muzzleTransform.position);
 //    }
 
 //    protected void FixedUpdate()

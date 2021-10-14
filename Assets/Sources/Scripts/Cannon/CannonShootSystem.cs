@@ -1,34 +1,24 @@
-using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 
-[Serializable]
-public struct CannonShootData : IComponentData
-{
-    public float3 Direction;
-    public float Force;
-    public float3 PredictedPosition;
-}
-
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(EndFramePhysicsSystem))]
 public class CannonShootSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEcbSystem;
+    private EndFixedStepSimulationEntityCommandBufferSystem _endFixedStepSimulationEntityCommandBuffer;
     
-
     protected override void OnCreate()
     {
         base.OnCreate();
         
-        _endSimulationEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+        _endFixedStepSimulationEntityCommandBuffer = World.GetOrCreateSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEcbSystem.CreateCommandBuffer().AsParallelWriter();
+        var ecb = _endFixedStepSimulationEntityCommandBuffer.CreateCommandBuffer().AsParallelWriter();
 
         Entities.
             WithName("CannonShootSystem").
@@ -38,9 +28,9 @@ public class CannonShootSystem : SystemBase
                     physicsVelocity.Linear = math.normalize(cannonShootData.Direction) * cannonShootData.Force;
 
                     ecb.RemoveComponent<CannonShootData>(entityInQueryIndex, entity);
-                    
+
                 }).ScheduleParallel();
 
-        _endSimulationEcbSystem.AddJobHandleForProducer(Dependency);
+        _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(Dependency);
     }
 }

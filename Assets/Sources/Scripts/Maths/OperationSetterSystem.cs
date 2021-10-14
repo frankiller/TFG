@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -7,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public struct OperationAnswer : IComponentData
+public struct OperationAnswer : IBufferElementData
 {
     public int Value;
     public float3 Position;
@@ -17,21 +16,16 @@ public struct OperationAnswer : IComponentData
 
 public class OperationSetterSystem : MonoBehaviour
 {
-    [SerializeField] private Text _operationText;
-    [SerializeField] private int _optionsNumber;
-    //[SerializeField] private Transform _centerTransform;
-    [SerializeField] private float _radius = 5f;
+    [SerializeField] private Text operationText;
+    [SerializeField] private float radius = 5f;
     
     private Questions _questions;
-    private int _instantiatedTargets = 0;
 
     private EntityManager _entityManager;
 
-    protected  void Start()
+    protected void Start()
     {
         _questions = ScriptableObject.CreateInstance<Questions>();
-        _questions.optionsRange = _optionsNumber;
-
         _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
     }
 
@@ -39,42 +33,46 @@ public class OperationSetterSystem : MonoBehaviour
     {
         if (GameManager.IsGameOver() || !GameManager.IsPlayState()) { return; }
 
-        if (_instantiatedTargets < _questions.optionsRange)
-        {
-            CreateOperation();
-        }
+        var gameManagerEntity = _entityManager.CreateEntityQuery(typeof(GameManagerTag)).GetSingletonEntity();
+        var gameInternalData = _entityManager.GetComponentData<OperationsInternalDataAuthoring>(gameManagerEntity);
+
+        if (!gameInternalData.CreateOperations) return;
+
+        _questions.optionsRange = gameInternalData.OperationRange;
+        CreateOperations();
+
+        gameInternalData.CreateOperations = false;
+        _entityManager.SetComponentData(gameManagerEntity, gameInternalData);
     }
 
-    private void CreateOperation()
+    private void CreateOperations()
     {
         var answer = _questions.SumOrMinusOperation();
         var answerList = _questions.RandomAnswerGenerator(answer);
 
-        _operationText.text = _questions.operationText;
+        operationText.text = _questions.operationText;
 
-        InstantiateTarget(answer, answerList);
+        FillOperationBuffer(answer, answerList);
     }
 
-    private void InstantiateTarget(int answer, IReadOnlyList<int> answerList)
+    private void FillOperationBuffer(int answer, IReadOnlyList<int> answerList)
     {
-        var lookAtPosition = _entityManager.GetComponentData<Translation>(_entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0]);
+        var lookAtPosition = _entityManager.GetComponentData<Translation>(_entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity());
+        var buffer = _entityManager.GetBuffer<OperationAnswer>(_entityManager.CreateEntityQuery(typeof(GameManagerTag)).GetSingletonEntity());
 
         for (var i = 0; i < _questions.optionsRange; i++)
         {
-            var randomPosition = Random.insideUnitCircle.normalized * _radius;
-            var newPosition = new Vector3(randomPosition.x, _radius, randomPosition.y);
+            var randomPosition = Random.insideUnitCircle.normalized * radius + new Vector2(lookAtPosition.Value.x, lookAtPosition.Value.z);
+            var newPosition = new Vector3(randomPosition.x, radius, randomPosition.y);
             var newRotation = Quaternion.LookRotation(new Vector3(lookAtPosition.Value.x, lookAtPosition.Value.y, lookAtPosition.Value.z) - newPosition);
 
-            var entity = _entityManager.CreateEntity();
-            _entityManager.AddComponentData(entity, new OperationAnswer
+            buffer.Add(new OperationAnswer
             {
                 Position = newPosition,
                 Rotation = newRotation,
                 Value = answerList[i],
                 IsCorrect = answerList[i] == answer
             });
-
-            _instantiatedTargets++;
         }
     }
 }

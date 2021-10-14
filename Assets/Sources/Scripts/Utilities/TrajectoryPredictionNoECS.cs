@@ -3,11 +3,16 @@ using UnityEngine;
 
 public class TrajectoryPredictionNoECS : ScriptableObject
 {
-    public float3 Predict(float t, float3 currentPosition, Vector3 force)
+    public float3 Predict(float3 currentPosition, Vector3 force)
     {
-        float x = force.x * t;
-        float z = force.z * t;
-        float y = (force.y * t) - (-Physics.gravity.y * Mathf.Pow(t, 2) / 2);
+        var gravity = -Physics.gravity.y;
+        var velocity = force.y;
+
+        var time = (velocity + Mathf.Sqrt(Mathf.Pow(velocity, 2) + 2 * gravity * currentPosition.y)) / gravity;
+
+        var x = force.x * time;
+        var z = force.z * time;
+        var y = (force.y * time) - (gravity * Mathf.Pow(time, 2) / 2);
 
         return new float3(x + currentPosition.x, y + currentPosition.y, z + currentPosition.z);
     }

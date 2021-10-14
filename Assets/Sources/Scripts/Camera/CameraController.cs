@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-public enum CameraPosition
+public enum CameraPositionNoEcs
 {
     Cannon,
     Cannonball
@@ -11,49 +11,51 @@ public enum CameraPosition
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private Transform _cameraTransform;
-
     private EntityManager _entityManager;
-    private EntityQuery _cannonEntityQuery;
+    private EntityQuery _cameraQuery;
+    private EntityQuery _cannonMuzzleEntityQuery;
     private EntityQuery _cannonballEntityQuery;
     
     private void Start()
     {
         _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        _cannonEntityQuery = _entityManager.CreateEntityQuery(typeof(CannonTag));
+        _cameraQuery = _entityManager.CreateEntityQuery(typeof(CameraTag));
+        _cannonMuzzleEntityQuery = _entityManager.CreateEntityQuery(typeof(CannonMuzzleTag));
         _cannonballEntityQuery = _entityManager.CreateEntityQuery(typeof(CannonballTag));
     }
 
-    public void SetCameraPosition(CameraPosition position, Vector3 cameraDirection = default, Vector3 cameraRotation = default)
+    public void SetCameraPosition(CameraPositionNoEcs positionNoEcs, Vector3 cameraDirection = default)
     {
-        var camera = _cameraTransform.gameObject;
-        var followEntityScript = camera.GetComponent<FollowEntity>();
-
-        if (followEntityScript == null)
+        switch (positionNoEcs)
         {
-            followEntityScript = camera.AddComponent<FollowEntity>();
-        }
-
-        switch (position)
-        {
-            case CameraPosition.Cannon:
-                followEntityScript.entityToFollow = _entityManager.GetBuffer<LinkedEntityGroup>(_cannonEntityQuery.GetSingletonEntity())[3].Value;
+            case CameraPositionNoEcs.Cannon:
+                SetCameraOnCannon();
                 break;
             
-            case CameraPosition.Cannonball:
-                followEntityScript.entityToFollow = _cannonballEntityQuery.GetSingletonEntity();
-                followEntityScript.offset = cameraDirection * 4;
-                break;
-            
-            default:
-                _cameraTransform.position = Vector3.zero;
+            case CameraPositionNoEcs.Cannonball:
+                SetCameraOnCannonball(cameraDirection);
                 break;
         }
     }
 
     public void ResetCameraPosition()
     {
-        _cameraTransform.parent = null;
-        _cameraTransform.position = Vector3.zero;
+        SetCameraOnCannon();
+    }
+
+    private void SetCameraOnCannon()
+    {
+        var cameraEntity = _cameraQuery.GetSingletonEntity();
+        var cannonMuzzleEntity = _cannonMuzzleEntityQuery.GetSingletonEntity();
+
+        _entityManager.SetComponentData(cameraEntity, new CameraTargetEntityData { Value = cannonMuzzleEntity });
+    }
+
+    private void SetCameraOnCannonball(Vector3 cameraDirection)
+    {
+        var cameraEntity = _cameraQuery.GetSingletonEntity();
+        var cannonballEntity = _cannonballEntityQuery.GetSingletonEntity();
+
+        _entityManager.SetComponentData(cameraEntity, new CameraTargetEntityData {Value = cannonballEntity });
     }
 }

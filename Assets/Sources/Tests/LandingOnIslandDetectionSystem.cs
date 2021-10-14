@@ -19,8 +19,7 @@ public class LandingOnIslandDetectionSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (!GameManager.IsFireState() || 
-            _cannonballEntityQuery.CalculateEntityCount() == 0) return;
+        if (!GameManager.IsFireState()) return;
 
 
     }

@@ -18,7 +18,7 @@ public class CannonManager : MonoBehaviour
         //_cannonMuzzle = GetComponent<CannonMuzzle>();
 
         EnableCannon(true);
-        GameManager.CameraController.SetCameraPosition(CameraPosition.Cannon, Vector3.forward);
+        GameManager.CameraController.SetCameraPosition(CameraPositionNoEcs.Cannon);
     }
 
     private void Update()
@@ -69,7 +69,8 @@ public class CannonManager : MonoBehaviour
     private static quaternion GetBarrelRotation()
     {
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0];
+        //var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0];
+        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity();
 
         var barrelEntity = entityManager.GetBuffer<LinkedEntityGroup>(cannonEntity)[2].Value;
         return entityManager.GetComponentData<Rotation>(barrelEntity).Value;
@@ -83,7 +84,8 @@ public class CannonManager : MonoBehaviour
     private static float3 GetCannonBasePosition()
     {
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0];
+        //var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0];
+        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity();
 
         var baseEntity = entityManager.GetBuffer<LinkedEntityGroup>(cannonEntity)[1].Value;
         return entityManager.GetComponentData<Translation>(baseEntity).Value;
@@ -92,7 +94,8 @@ public class CannonManager : MonoBehaviour
     public static float3 GetCannonBarrelPosition()
     {
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0];
+        //var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0];
+        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity();
 
         var barrelEntity = entityManager.GetBuffer<LinkedEntityGroup>(cannonEntity)[2].Value;
         return entityManager.GetComponentData<Translation>(barrelEntity).Value;

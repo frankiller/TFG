@@ -103,7 +103,7 @@ public abstract class SpawnObjectSystemBase<T> : SystemBase where T : SpawnSetti
     public Entity CreateBody(BlobAssetReference<Collider> collider,  float3 position, quaternion orientation,
         float3 linearVelocity, float3 angularVelocity, float mass, bool isDynamic)
     {
-        ComponentType[] componentTypes = new ComponentType[isDynamic ? 9 : 6];
+        ComponentType[] componentTypes = new ComponentType[isDynamic ? 10 : 7];
 
         componentTypes[0] = typeof(RenderMesh);
         componentTypes[1] = typeof(RenderBounds);
@@ -111,12 +111,13 @@ public abstract class SpawnObjectSystemBase<T> : SystemBase where T : SpawnSetti
         componentTypes[3] = typeof(Rotation);
         componentTypes[4] = typeof(LocalToWorld);
         componentTypes[5] = typeof(PhysicsCollider);
+        componentTypes[6] = typeof(PhysicsMassOverride);
         
         if (isDynamic)
         {
-            componentTypes[6] = typeof(PhysicsVelocity);
-            componentTypes[7] = typeof(PhysicsMass);
-            componentTypes[8] = typeof(PhysicsDamping);
+            componentTypes[7] = typeof(PhysicsVelocity);
+            componentTypes[8] = typeof(PhysicsMass);
+            componentTypes[9] = typeof(PhysicsDamping);
         }
 
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -130,6 +131,7 @@ public abstract class SpawnObjectSystemBase<T> : SystemBase where T : SpawnSetti
         var colliderComponent = new PhysicsCollider {Value = collider};
         entityManager.SetComponentData(entity, colliderComponent);
 
+        entityManager.SetComponentData(entity, new PhysicsMassOverride {IsKinematic = 1});
 
         CreateRenderMeshForCollider(entityManager, entity, collider, _material);
 

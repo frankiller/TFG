@@ -25,7 +25,7 @@ public class CannonMuzzleSystem : SystemBase
     private quaternion _currentRotation;
     private float3 _lastPosition = float3.zero;
     private quaternion _lastRotation = quaternion.identity;
-    private float3 _lastPrediction = float3.zero;
+    private float _impulseForce;
 
     private bool isFireButtonPressed = false;
 
@@ -38,11 +38,10 @@ public class CannonMuzzleSystem : SystemBase
         _buildPhysicsSystem = currentWorld.GetOrCreateSystem<BuildPhysicsWorld>();
         _entityManager = currentWorld.EntityManager;
 
-        
         _muzzleTransform = Camera.main.transform;
         _cannonballPrefab = Resources.Load("Prefabs/CannonballNoECS") as GameObject;
 
-        var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, _blobAssetStore = new BlobAssetStore());
+        var settings = GameObjectConversionSettings.FromWorld(currentWorld, _blobAssetStore = new BlobAssetStore());
         _cannonballEntityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(_cannonballPrefab, settings);
     }
 
@@ -51,6 +50,7 @@ public class CannonMuzzleSystem : SystemBase
         base.OnStartRunning();
 
         _trajectoryPrediction = ScriptableObject.CreateInstance<TrajectoryPredictionNoECS>();
+        _impulseForce = GetComponent<InputVariables>(GetSingletonEntity<InputVariables>()).ImpulseForce;
     }
 
     protected override void OnUpdate()
@@ -84,7 +84,7 @@ public class CannonMuzzleSystem : SystemBase
 
         GameManager.StartFireState();
         FireCannonball();
-        GameManager.CameraController.SetCameraPosition(CameraPosition.Cannonball, _muzzleTransform.forward, _muzzleTransform.eulerAngles);
+        GameManager.CameraController.SetCameraPosition(CameraPositionNoEcs.Cannonball, _muzzleTransform.forward);
     }
 
     private void FireCannonball()
@@ -95,11 +95,11 @@ public class CannonMuzzleSystem : SystemBase
         _entityManager.SetComponentData(cannonBallEntity, new Translation { Value = _muzzleTransform.position});
         _entityManager.SetComponentData(cannonBallEntity, new Rotation { Value = _muzzleTransform.rotation });
         _entityManager.AddComponentData(cannonBallEntity, new CannonballTag());
+        _entityManager.AddComponentData(cannonBallEntity, new PositionPredictionData { PredictedPosition = _predictedTrajectory });
         _entityManager.AddComponentData(cannonBallEntity, new CannonShootData
         {
             Direction = _muzzleTransform.forward,
-            Force = 150f, //Aplicar ImpulseForce desde InputVariables
-            PredictedPosition = _predictedTrajectory
+            Force = _impulseForce
         });
 
         _entityManager.AddComponentData(cannonBallEntity, new PhysicsCollider
@@ -116,6 +116,7 @@ public class CannonMuzzleSystem : SystemBase
 
         if (IsTargetCorrectAnswer())
         {
+            //Sustituir IsCorrectTag por la inclusion condicional de PositionPredictionData (Sistemas incluidos)
             _entityManager.AddComponentData(cannonBallEntity, new IsCorrectTag());
         }
     }
@@ -127,22 +128,23 @@ public class CannonMuzzleSystem : SystemBase
         var input = new RaycastInput
         {
             Start = _muzzleTransform.position,
-            End = _muzzleTransform.forward * 150f, //Aplicar ImpulseForce desde InputVariables
-            Filter = new CollisionFilter
-            {
-                BelongsTo = ~0u,
-                CollidesWith = ~0u,
-                GroupIndex = 0
-            }
+            End = _muzzleTransform.position + _muzzleTransform.forward * _impulseForce,
+            Filter = CollisionFilter.Default
         };
 
-        return collisionWorld.CastRay(input, out var hit)
-               && _entityManager.HasComponent<IsCorrectTag>(_buildPhysicsSystem.PhysicsWorld.Bodies[hit.RigidBodyIndex].Entity);
+        bool isHit = collisionWorld.CastRay(input, out var hit);
+        bool hasComponent = _entityManager.HasComponent<IsCorrectTag>(_buildPhysicsSystem.PhysicsWorld.Bodies[hit.RigidBodyIndex].Entity);
+        if (isHit)
+        {
+            Debug.Log($"Hit! en {hit.Entity}");
+        }
+
+        return isHit && hasComponent;
     }
 
     private float3 PredictTrajectory()
     {
-        return _trajectoryPrediction.Predict(10f, _muzzleTransform.position, _muzzleTransform.forward * 150f);
+        return _trajectoryPrediction.Predict(_muzzleTransform.position, _muzzleTransform.forward * _impulseForce);
     }
 
     protected override void OnDestroy()

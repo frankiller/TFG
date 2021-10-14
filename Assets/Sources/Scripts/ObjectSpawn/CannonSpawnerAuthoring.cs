@@ -35,8 +35,11 @@ public class CannonSpawnerSystem : SpawnObjectSystemBase<CannonSpawnSettings>
 
         var newCannon = entityManager.Instantiate(cannonPrefab);
         entityManager.SetComponentData(newCannon, new Translation { Value = new float3(0f, .5f, 0f) });
-        entityManager.SetComponentData(newCannon, new Rotation { Value = quaternion.identity});
+        entityManager.SetComponentData(newCannon, new Rotation { Value = quaternion.identity });
         entityManager.AddComponentData(newCannon, new CannonTag());
+
+        var cannonMuzzleEntity = GetBuffer<LinkedEntityGroup>(newCannon)[3].Value;
+        entityManager.AddComponentData(cannonMuzzleEntity, new CannonMuzzleTag());
 
         var attachedObject = new GameObject();
         attachedObject.AddComponent<CannonManager>();

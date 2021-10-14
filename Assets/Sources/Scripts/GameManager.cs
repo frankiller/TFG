@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public enum GameState
+public enum GameStateFSM
 {
     Ready,
     Starting,
@@ -20,10 +20,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private float delay = 2f;
 
-    //private Transform _cannon;
-    //Referencia al script de spawneo de bolas
-
-    private GameState _gameState;
+    private GameStateFSM _gameStateFsm;
 
     private void Awake()
     {
@@ -41,12 +38,12 @@ public class GameManager : MonoBehaviour
         //_cannon = FindObjectOfType<CannonManager>().transform;
         //Instancia al script de spawneo de bolas
 
-        _gameState = GameState.Ready;
+        _gameStateFsm = GameStateFSM.Ready;
     }
 
     void Start()
     {
-        _gameState = GameState.Starting;
+        _gameStateFsm = GameStateFSM.Starting;
         StartCoroutine(MainGameLoopRoutine());
     }
 
@@ -63,14 +60,14 @@ public class GameManager : MonoBehaviour
         
         yield return new WaitForSeconds(delay);
         
-        _gameState = GameState.Playing;
+        _gameStateFsm = GameStateFSM.Playing;
     }
 
     private IEnumerator PlayGameRoutine()
     {
         Debug.Log("Starting to Play!");
 
-        while (_gameState == GameState.Playing || _gameState == GameState.Shooting)
+        while (_gameStateFsm == GameStateFSM.Playing || _gameStateFsm == GameStateFSM.Shooting)
         {
             yield return null;
         }
@@ -80,7 +77,7 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        _gameState = GameState.Ready;
+        _gameStateFsm = GameStateFSM.Ready;
 
         Debug.Log("EndGame");
 
@@ -105,42 +102,49 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null) { return false; }
 
-        return Instance._gameState == GameState.Starting;
+        return Instance._gameStateFsm == GameStateFSM.Starting;
+    }
+
+    public static void StartPlayState()
+    {
+        if (Instance == null) { return; }
+
+        Instance._gameStateFsm = GameStateFSM.Playing;
     }
 
     public static bool IsPlayState()
     {
         if (Instance == null) { return false; }
 
-        return Instance._gameState == GameState.Playing;
+        return Instance._gameStateFsm == GameStateFSM.Playing;
     }
 
     public static void StartFireState()
     {
         if (Instance == null) { return; }
 
-        Instance._gameState = GameState.Shooting;
+        Instance._gameStateFsm = GameStateFSM.Shooting;
     }
 
     public static bool IsFireState()
     {
         if (Instance == null) { return false; }
 
-        return Instance._gameState == GameState.Shooting;
+        return Instance._gameStateFsm == GameStateFSM.Shooting;
     }
 
     public static void StartLandingState()
     {
         if (Instance == null) { return; }
 
-        Instance._gameState = GameState.Landing;
+        Instance._gameStateFsm = GameStateFSM.Landing;
     }
 
     public static bool IsLandingState()
     {
         if (Instance == null) { return false; }
 
-        return Instance._gameState == GameState.Landing;
+        return Instance._gameStateFsm == GameStateFSM.Landing;
     }
 
     public static void EndGame()
@@ -149,13 +153,13 @@ public class GameManager : MonoBehaviour
 
         CameraController.ResetCameraPosition();
         CannonManager.EnableCannon(false);
-        Instance._gameState = GameState.GameOver;
+        Instance._gameStateFsm = GameStateFSM.GameOver;
     }
 
     public static bool IsGameOver()
     {
         if (Instance == null) { return false; }
 
-        return Instance._gameState == GameState.GameOver;
+        return Instance._gameStateFsm == GameStateFSM.GameOver;
     }
 }
