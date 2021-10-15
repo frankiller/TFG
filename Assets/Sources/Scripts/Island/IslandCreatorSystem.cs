@@ -14,7 +14,7 @@ public class IslandCreatorSystem : SystemBase
         base.OnCreate();
 
         _islandSpawnerSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<IslandSpawnerSystem>();
-        _positionPredictionDataQuery = GetEntityQuery(typeof(PositionPredictionData), typeof(IsCorrectTag));
+        _positionPredictionDataQuery = GetEntityQuery(typeof(PositionPredictionData));
 
         RequireForUpdate(_positionPredictionDataQuery);
     }

@@ -50,19 +50,17 @@ public class IslandSpawnerSystem : SpawnObjectSystemBase<GroundSpawnSettings>
         var islandSpawnerEntity = GetSingletonEntity<GroundSpawnSettings>();
         var spawnData = GetComponent<Ground>(islandSpawnerEntity);
 
-        var boxMaterial = new Material
-        {
-            Friction = spawnData.Friction,
-            Restitution = spawnData.Restitution,
-            CollisionResponse = CollisionResponsePolicy.CollideRaiseCollisionEvents
-        };
-
         var boxCollider = BoxCollider.Create(new BoxGeometry
         {
             Size = spawnData.Size,
             BevelRadius = spawnData.BevelRadius,
             Orientation = spawnData.Orientation,
-        }, CollisionFilter.Default, boxMaterial);
+        }, CollisionFilter.Default, new Material
+        {
+            Friction = spawnData.Friction,
+            Restitution = spawnData.Restitution,
+            CollisionResponse = CollisionResponsePolicy.CollideRaiseCollisionEvents
+        });
 
         CreatedColliders.Add(boxCollider);
 

@@ -35,9 +35,6 @@ public class GameManager : MonoBehaviour
 
         CameraController = GetComponent<CameraController>();
 
-        //_cannon = FindObjectOfType<CannonManager>().transform;
-        //Instancia al script de spawneo de bolas
-
         _gameStateFsm = GameStateFSM.Ready;
     }
 
