@@ -80,8 +80,7 @@ public class CannonMoverSystem : SystemBase
 
         _inputLagTimer = 0f;
 
-        //_currentXEulerRotation = CannonManager.GetCannonBarrelRotation().value.x;
-        var barrelRotation = CannonManager.GetCannonBarrelRotation().value;
+        var barrelRotation = CannonManager.GetCannonBarrelRotation(_entityManager).value;
         _currentXEulerRotation = new Quaternion(barrelRotation.x, barrelRotation.y, barrelRotation.z, barrelRotation.w).eulerAngles.x;
 
         if (_currentXEulerRotation >= 180)
@@ -91,7 +90,7 @@ public class CannonMoverSystem : SystemBase
 
         _currentXEulerRotation = ClampVerticalAngle(_currentXEulerRotation);
 
-        _currentYRotation = CannonManager.GetCannonBarrelRotation().value.y;
+        _currentYRotation = CannonManager.GetCannonBarrelRotation(_entityManager).value.y;
         _currentXRotation = _currentXEulerRotation;
     }
 
@@ -102,13 +101,11 @@ public class CannonMoverSystem : SystemBase
         var yRotation = GetYRotationToMouse();
         
         var baseEntity = linkedEntityGroup[1].Value;
-        //_entityManager.SetComponentData(baseEntity, new Rotation { Value = GetYRotationToMouse() });
         var fromRotation = _entityManager.GetComponentData<Rotation>(baseEntity).Value;
         var toRotation = quaternion.Euler(0f, yRotation, 0f);
         _entityManager.SetComponentData(baseEntity, new Rotation { Value = Quaternion.Lerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
 
         var barrelEntity = linkedEntityGroup[2].Value;
-        //_entityManager.SetComponentData(barrelEntity, new Rotation { Value = GetXRotationToMouse() * GetYRotationToMouse() });
         fromRotation = _entityManager.GetComponentData<Rotation>(barrelEntity).Value;
         toRotation = quaternion.Euler(GetXRotationToMouse(), yRotation, 0f);
         _entityManager.SetComponentData(barrelEntity, new Rotation { Value = Quaternion.Lerp(fromRotation, toRotation, Time.DeltaTime * 5f)});

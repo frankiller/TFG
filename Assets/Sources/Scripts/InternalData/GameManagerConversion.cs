@@ -35,5 +35,3 @@ public class GameManagerConversion : MonoBehaviour, IConvertGameObjectToEntity
         ));
     }
 }
-
-public class GameStateTransitionSystem{}

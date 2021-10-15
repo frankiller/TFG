@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -81,20 +82,6 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    //public static Vector3 GetCannonPosition()
-    //{
-    //    if (Instance == null) { return Vector3.zero; }
-
-    //    return Instance._cannon != null ? GameManager.Instance._cannon.position : Vector3.zero;
-    //}
-
-    //public static Transform GetCannonTransform()
-    //{
-    //    if (Instance == null) { return new RectTransform(); }
-
-    //    return Instance._cannon != null ? Instance._cannon : new RectTransform();
-    //}
-
     public static bool IsStartingState()
     {
         if (Instance == null) { return false; }
@@ -130,20 +117,6 @@ public class GameManager : MonoBehaviour
         return Instance._gameStateFsm == GameStateFSM.Shooting;
     }
 
-    public static void StartLandingState()
-    {
-        if (Instance == null) { return; }
-
-        Instance._gameStateFsm = GameStateFSM.Landing;
-    }
-
-    public static bool IsLandingState()
-    {
-        if (Instance == null) { return false; }
-
-        return Instance._gameStateFsm == GameStateFSM.Landing;
-    }
-
     public static void EndGame()
     {
         if (Instance == null) { return; }
@@ -158,5 +131,18 @@ public class GameManager : MonoBehaviour
         if (Instance == null) { return false; }
 
         return Instance._gameStateFsm == GameStateFSM.GameOver;
+    }
+}
+
+public class GameStateUtility
+{
+    public static void SetPlayState(EntityCommandBuffer.ParallelWriter ecb, Entity e, int index)
+    {
+        ecb.SetComponent(index, e, new GameStateData { Value = GameState.Playing});
+    }
+
+    public static void SetShootState(EntityCommandBuffer.ParallelWriter ecb, Entity e, int index)
+    {
+        ecb.SetComponent(index, e, new GameStateData { Value = GameState.Shooting});
     }
 }

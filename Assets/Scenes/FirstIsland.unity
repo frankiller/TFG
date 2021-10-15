@@ -260,8 +260,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Material: {fileID: 0}
-  CannonballPrefab: {fileID: 1766995665465934374, guid: 27a67ab7f82c2924b8370e368d33ece0,
-    type: 3}
+  Position:
+    x: 0
+    y: 0.5
+    z: 0
+  Rotation:
+    value:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
 --- !u!4 &264705096
 Transform:
   m_ObjectHideFlags: 0

@@ -12,7 +12,7 @@ public struct TextMeshInternalData : IComponentData
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(BuildPhysicsWorld))]
-public class TargetSpawnerSystem : SystemBase
+public class TargetSpawnSystem : SystemBase
 {
     private EntityManager _entityManager;
     private EndFixedStepSimulationEntityCommandBufferSystem _endFixedStepSimulationEntityCommandBuffer;
@@ -34,7 +34,7 @@ public class TargetSpawnerSystem : SystemBase
         var ecb = _endFixedStepSimulationEntityCommandBuffer.CreateCommandBuffer();
 
         Entities.
-            WithName("TargetSpawnerSystem").
+            WithName("TargetSpawnSystem").
             ForEach((ref DynamicBuffer<OperationAnswer> operations) =>
             {
                 for (int i = 0; i < operations.Length; i++)
@@ -72,7 +72,7 @@ public class TargetSpawnerSystem : SystemBase
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(BuildPhysicsWorld))]
-[UpdateAfter(typeof(TargetSpawnerSystem))]
+[UpdateAfter(typeof(TargetSpawnSystem))]
 public class UpdateTargetDataSystem : SystemBase
 {
     private EntityQuery _targetQuery;

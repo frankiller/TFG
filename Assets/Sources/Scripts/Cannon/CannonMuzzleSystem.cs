@@ -103,8 +103,8 @@ public class CannonMuzzleSystem : SystemBase
 
     private void UpdateBarrelPositionData()
     {
-        _currentPosition = CannonManager.GetCannonBarrelPosition();
-        _currentRotation = CannonManager.GetCannonBarrelRotation();
+        _currentPosition = CannonManager.GetCannonBarrelPosition(_entityManager);
+        _currentRotation = CannonManager.GetCannonBarrelRotation(_entityManager);
     }
 
     private void FireCannonball()

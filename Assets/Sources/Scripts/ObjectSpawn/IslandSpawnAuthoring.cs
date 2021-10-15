@@ -15,7 +15,7 @@ public struct Ground : IComponentData
 
 public class GroundSpawnSettings : SpawnSettings { }
 
-public class IslandSpawnerAuthoring : SpawnObjectAuthoring<GroundSpawnSettings>
+public class IslandSpawnAuthoring : SpawnObjectAuthoring<GroundSpawnSettings>
 {
     public float3 Position = float3.zero;
     public quaternion Orientation = quaternion.identity;
