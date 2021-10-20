@@ -18,7 +18,6 @@ public enum GameState
 public struct GameStateData : IComponentData
 {
     public GameState Value;
-    public GameState NexState;
 }
 
 public class GameManagerConversion : MonoBehaviour, IConvertGameObjectToEntity
@@ -33,5 +32,7 @@ public class GameManagerConversion : MonoBehaviour, IConvertGameObjectToEntity
                 typeof(OperationAnswer)
             }
         ));
+
+        dstManager.SetComponentData(entity, new GameStateData {Value = GameState.Ready});
     }
 }

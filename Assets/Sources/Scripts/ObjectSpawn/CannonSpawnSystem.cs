@@ -1,5 +1,4 @@
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using World = Unity.Entities.World;
@@ -19,8 +18,7 @@ public class CannonSpawnSystem : SpawnObjectSystemBase<CannonSpawnData>
         entityManager.SetComponentData(newCannon, new Rotation { Value = spawnData.Rotation });
         entityManager.AddComponentData(newCannon, new CannonTag());
 
-        var cannonMuzzleEntity = GetBuffer<LinkedEntityGroup>(newCannon)[3].Value;
-        entityManager.AddComponentData(cannonMuzzleEntity, new CannonMuzzleTag());
+        entityManager.AddComponentData(GetBuffer<LinkedEntityGroup>(newCannon)[3].Value, new CannonMuzzleTag());
 
         var attachedObject = new GameObject();
         attachedObject.AddComponent<CannonManager>();

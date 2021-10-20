@@ -42,7 +42,7 @@ public class CannonManager : MonoBehaviour
     public static void EnableCannon(bool state)
     {
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).ToEntityArray(Allocator.Temp)[0];
+        var cannonEntity = entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity();
 
         if (state)
         {
