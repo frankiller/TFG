@@ -5,5 +5,5 @@ using Unity.Mathematics;
 [Serializable]
 public struct PositionPredictionData : IComponentData
 {
-    public float3 PredictedPosition;
+    public float3 Value;
 }

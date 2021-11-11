@@ -1,22 +1,13 @@
 using System.Collections.Generic;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public struct OperationAnswer : IBufferElementData
-{
-    public int Value;
-    public float3 Position;
-    public quaternion Rotation;
-    public bool IsCorrect;
-}
-
 public class OperationSetterSystem : MonoBehaviour
 {
-    [SerializeField] private Text operationText;
+    [SerializeField] private Text operationText; //Podría ir en un componente authoring de tipo clase y que se actualice en un sistema aparte
     [SerializeField] private float radius = 5f;
     
     private Questions _questions;
@@ -58,15 +49,15 @@ public class OperationSetterSystem : MonoBehaviour
     private void FillOperationBuffer(int answer, IReadOnlyList<int> answerList)
     {
         var lookAtPosition = _entityManager.GetComponentData<Translation>(_entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity());
-        var buffer = _entityManager.GetBuffer<OperationAnswer>(_entityManager.CreateEntityQuery(typeof(GameManagerTag)).GetSingletonEntity());
+        var buffer = _entityManager.GetBuffer<OperationAnswerBuffer>(_entityManager.CreateEntityQuery(typeof(GameManagerTag)).GetSingletonEntity());
 
         for (var i = 0; i < _questions.optionsRange; i++)
         {
             var randomPosition = Random.insideUnitCircle.normalized * radius + new Vector2(lookAtPosition.Value.x, lookAtPosition.Value.z);
-            var newPosition = new Vector3(randomPosition.x, radius, randomPosition.y);
+            var newPosition = new Vector3(randomPosition.x, lookAtPosition.Value.y + radius, randomPosition.y);
             var newRotation = Quaternion.LookRotation(new Vector3(lookAtPosition.Value.x, lookAtPosition.Value.y, lookAtPosition.Value.z) - newPosition);
 
-            buffer.Add(new OperationAnswer
+            buffer.Add(new OperationAnswerBuffer
             {
                 Position = newPosition,
                 Rotation = newRotation,

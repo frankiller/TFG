@@ -1,33 +1,26 @@
+using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
-public interface ISpawnSettingsEntity
-{
-    public Entity spawnSettingsEntity { get; set; }
-}
+public class SpawnObjectAuthoring : SpawnObjectAuthoringBase<SpawnSettings> {}
 
-public interface ISpawnSettings 
+public abstract class SpawnObjectAuthoringBase<T> : MonoBehaviour, IConvertGameObjectToEntity, IDeclareReferencedPrefabs 
+    where T : struct, IComponentData, ISpawnSettings
 {
-    public float Friction { get; set; }
-    public float Restitution { get; set; }
-}
+    public GameObject Prefab;
+    public float3 Position;
+    public quaternion Rotation;
 
-public abstract class SpawnSettings : IComponentData
-{
-    public Material Material;
-}
-
-public abstract class SpawnObjectAuthoring<T> : MonoBehaviour, IConvertGameObjectToEntity where T : SpawnSettings, new()
-{
-    public Material Material;
-
-    public virtual void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+    public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
         dstManager.SetName(entity, $"{name}");
 
-        T spawnSettings = new T
+        var spawnSettings = new T
         {
-            Material = Material
+           Prefab = conversionSystem.GetPrimaryEntity(Prefab),
+           Position = Position,
+           Rotation = Rotation
         };
 
         Configure(ref spawnSettings);
@@ -35,5 +28,7 @@ public abstract class SpawnObjectAuthoring<T> : MonoBehaviour, IConvertGameObjec
         dstManager.AddComponentData(entity, spawnSettings);
     }
 
-    public virtual void Configure(ref T spawnSettings) { }
+    public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs) => referencedPrefabs.Add(Prefab);
+
+    internal virtual void Configure(ref T spawnSettings) { }
 }

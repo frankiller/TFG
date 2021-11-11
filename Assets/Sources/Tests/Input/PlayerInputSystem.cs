@@ -5,7 +5,7 @@
 //{
 //    protected override void OnUpdate()
 //    {
-//        Entities.ForEach((in InputData inputData) =>
+//        Entities.ForEach((in InputDataAuthoring inputData) =>
 //        {
 //            bool isLeftMouseButtonPressed = Input.GetKey(inputData.LeftMouseButton);
 //        }).Run();

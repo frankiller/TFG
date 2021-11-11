@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,11 +12,9 @@ public enum GameStateFSM
     GameOver
 }
 
-[RequireComponent(typeof(CameraController))]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public static CameraController CameraController;
 
     [SerializeField] private float delay = 2f;
 
@@ -33,8 +30,6 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
-
-        CameraController = GetComponent<CameraController>();
 
         _gameStateFsm = GameStateFSM.Ready;
     }
@@ -120,9 +115,6 @@ public class GameManager : MonoBehaviour
     public static void EndGame()
     {
         if (Instance == null) { return; }
-
-        CameraController.ResetCameraPosition();
-        CannonManager.EnableCannon(false);
         Instance._gameStateFsm = GameStateFSM.GameOver;
     }
 
@@ -131,18 +123,5 @@ public class GameManager : MonoBehaviour
         if (Instance == null) { return false; }
 
         return Instance._gameStateFsm == GameStateFSM.GameOver;
-    }
-}
-
-public class GameStateUtility
-{
-    public static void SetPlayState(EntityCommandBuffer.ParallelWriter ecb, Entity e, int index)
-    {
-        ecb.SetComponent(index, e, new GameStateData { Value = GameState.Playing});
-    }
-
-    public static void SetShootState(EntityCommandBuffer.ParallelWriter ecb, Entity e, int index)
-    {
-        ecb.SetComponent(index, e, new GameStateData { Value = GameState.Shooting});
     }
 }
