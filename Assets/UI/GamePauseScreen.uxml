@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="FluffyMenus.uss" />
+    <GamePauseScreen style="flex-grow: 1;">
+        <ui:VisualElement name="game-pause-screen" class="screen screen-background">
+            <ui:VisualElement name="menu-center-container" class="menu-center-panel menu-background">
+                <ui:VisualElement name="menu-pause-info" style="align-items: center; justify-content: center;">
+                    <ui:Label text="PAUSA" display-tooltip-when-elided="true" name="label-pause" class="label" style="font-size: 50px; -unity-font-style: bold; -unity-text-outline-color: rgb(200, 25, 25); color: rgb(255, 175, 50); text-shadow: 2px 1px 1px rgb(200, 25, 25); letter-spacing: 15px; background-image: url(&apos;/Assets/UI/Graphics/FluffyChickenLogo.png&apos;); -unity-background-scale-mode: scale-and-crop; width: 200px; height: 200px; -unity-text-outline-width: 4px;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="menu-volume-container" style="align-items: center;">
+                    <ui:Slider label="Volumen" value="1" high-value="1" low-value="0.0001" name="slider-volume" class="label-override slider-dragger-override slider-tracker-override slider-dragger-border-override" style="flex-shrink: 1; width: 100%; flex-direction: column; align-items: stretch; justify-content: center; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 10px; padding-top: 20px; padding-bottom: 20px;" />
+                    <ui:Toggle name="toggle-mute" text="Silenciar" style="-unity-text-align: middle-center; -unity-font: url(&apos;/Assets/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf&apos;); -unity-font-definition: none; font-size: 20px; color: rgb(255, 175, 50); -unity-text-outline-width: 1px; -unity-text-outline-color: rgb(200, 25, 25); text-shadow: 2px 1px 0 rgb(0, 0, 0);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="menu-button-container" class="menu-button-container" style="flex-direction: row; justify-content: center;">
+                    <ui:Button text="Seguir jugando" display-tooltip-when-elided="true" name="button-back-play" class="menu-button menu-button-bottom" />
+                    <ui:Button text="Finalizar juego" name="button-back" display-tooltip-when-elided="true" class="menu-button menu-button-bottom" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </GamePauseScreen>
+</ui:UXML>

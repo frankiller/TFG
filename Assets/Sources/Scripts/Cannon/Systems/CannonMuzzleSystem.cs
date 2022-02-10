@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
-using UnityEngine;
+using UnityEngine.InputSystem;
 using Material = Unity.Physics.Material;
 using SphereCollider = Unity.Physics.SphereCollider;
 
@@ -13,14 +13,9 @@ public class CannonMuzzleSystem : SystemBase
 {
     private BuildPhysicsWorld _buildPhysicsSystem;
     private EntityManager _entityManager;
-    private BlobAssetStore _blobAssetStore;
-    
-    private TrajectoryPredictionNoECS _trajectoryPrediction;
+
     private float3 _predictedTrajectory;
-    
-    private GameObject _cannonballPrefab;
-    private Entity _cannonballEntityPrefab;
-    
+
     private float3 _muzzlePosition;
     private float3 _muzzleDirection;
     private quaternion _muzzleRotation;
@@ -31,6 +26,9 @@ public class CannonMuzzleSystem : SystemBase
     private float3 _lastPosition = float3.zero;
     private quaternion _lastRotation = quaternion.identity;
 
+    private EntityQuery _cannonballEntityQuery;
+    private Entity _cannonballPrefab;
+
     protected override void OnCreate()
     {
         base.OnCreate();
@@ -40,43 +38,42 @@ public class CannonMuzzleSystem : SystemBase
         _buildPhysicsSystem = currentWorld.GetOrCreateSystem<BuildPhysicsWorld>();
         _entityManager = currentWorld.EntityManager;
 
-        _cannonballPrefab = Resources.Load("Prefabs/CannonballNoECS") as GameObject;
-
-        var settings = GameObjectConversionSettings.FromWorld(currentWorld, _blobAssetStore = new BlobAssetStore());
-        _cannonballEntityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(_cannonballPrefab, settings);
+        _cannonballEntityQuery = GetEntityQuery(ComponentType.ReadOnly<CannonballTag>());
 
         RequireSingletonForUpdate<GetPlayerActionsTag>();
+        RequireSingletonForUpdate<CannonballPrefabConversion>(); 
     }
 
     protected override void OnStartRunning()
     {
         base.OnStartRunning();
 
-        _trajectoryPrediction = ScriptableObject.CreateInstance<TrajectoryPredictionNoECS>();
+        _cannonballPrefab = GetSingleton<CannonballPrefabConversion>().CannonballPrefab;
         _impulseForce = GetSingleton<InputVariables>().ImpulseForce;
     }
 
     protected override void OnUpdate()
     {
-        UpdateMuzzlePositionData();
+        if (!_cannonballEntityQuery.IsEmptyIgnoreFilter) return;
 
+        UpdateMuzzlePositionData();
         UpdateBarrelPositionData();
 
-        if (math.all(_currentPosition != _lastPosition) && !GameManager.IsFireState())
+        if (math.all(_currentPosition != _lastPosition))
         {
             _predictedTrajectory = PredictTrajectory();
         }
 
         _lastPosition = _currentPosition;
 
-        if (!_currentRotation.Equals(_lastRotation) && !GameManager.IsFireState())
+        if (!_currentRotation.Equals(_lastRotation))
         {
             _predictedTrajectory = PredictTrajectory();
         }
 
         _lastRotation = _currentRotation;
 
-        if (!GetSingleton<LeftMouseButtonData>().IsClicked || GameManager.IsFireState()) return;
+        if (!GetSingleton<LeftMouseButtonData>().IsClicked) return;
 
         FireCannonball();
     }
@@ -97,7 +94,7 @@ public class CannonMuzzleSystem : SystemBase
 
     private void FireCannonball()
     {
-        var cannonBallEntity = _entityManager.Instantiate(_cannonballEntityPrefab);
+        var cannonBallEntity = _entityManager.Instantiate(_cannonballPrefab);
 
         _entityManager.SetName(cannonBallEntity, $"Cannonball-{cannonBallEntity.Index}");
         _entityManager.SetComponentData(cannonBallEntity, new Translation { Value = _muzzlePosition });
@@ -121,10 +118,15 @@ public class CannonMuzzleSystem : SystemBase
             })
         });
 
-        if (IsTargetCorrectAnswer())
-        {
-            _entityManager.AddComponentData(cannonBallEntity, new PositionPredictionData { Value = _predictedTrajectory });
-        }
+        if (!IsTargetCorrectAnswer()) return;
+
+        _entityManager.AddComponentData(cannonBallEntity, new PositionPredictionData { Value = _predictedTrajectory });
+        _entityManager.SetComponentData(GetSingletonEntity<MenuManagerTag>(), new SuccessLabelData { IsVisible = true });
+
+        var score = GetSingleton<PlayerSessionScoreData>();
+        score.Score++;
+        _entityManager.SetComponentData(GetSingletonEntity<GameManagerTag>(), score);
+        
     }
 
     private bool IsTargetCorrectAnswer()
@@ -144,23 +146,21 @@ public class CannonMuzzleSystem : SystemBase
 
     private float3 PredictTrajectory()
     {
-        return _trajectoryPrediction.Predict(_muzzlePosition, _muzzleDirection * _impulseForce);
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        _blobAssetStore.Dispose();
+        return new TrajectoryPredictionNoECS().Predict(_muzzlePosition, _muzzleDirection * _impulseForce);
     }
 }
 
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+[UpdateBefore(typeof(CannonMuzzleSystem))]
 public class ManagePlayerInput : SystemBase
 {
     protected override void OnUpdate()
     {
-        Entities.ForEach((ref LeftMouseButtonData leftMouseButton, in InputDataAuthoring inputData) =>
+        var wasPressed = Mouse.current.leftButton.wasPressedThisFrame;
+
+        Entities.ForEach((ref LeftMouseButtonData leftMouseButton) =>
         {
-            leftMouseButton.IsClicked = Input.GetMouseButtonDown(inputData.LeftMouseButton);
+            leftMouseButton.IsClicked = wasPressed;
         }).Run();
     }
 }

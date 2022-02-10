@@ -1,5 +1,93 @@
 using Unity.Entities;
 
+[UpdateAfter(typeof(GameStartSystem))]
+public class StartLoadMenuSceneSystem : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<LoadMenuSceneTag>();
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+
+        Entities.
+            WithName("StartLoadMenuSceneSystem").
+            WithAll<LoadMenuSceneTag>().
+            ForEach((Entity gameManagerEntity) =>
+            {
+                ecb.RemoveComponent<LoadMenuSceneTag>(gameManagerEntity);
+            }).Schedule();
+
+        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+    }
+}
+
+public class StartReloadMenuSceneSystem : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<ReloadMenuSceneTag>();
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+
+        Entities.
+            WithName("StartReloadMenuSceneSystem").
+            WithAll<ReloadMenuSceneTag>().
+            ForEach((Entity gameManagerEntity) =>
+            {
+                ecb.RemoveComponent<ReloadMenuSceneTag>(gameManagerEntity);
+            }).Schedule();
+
+        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+    }
+}
+
+public class StartLoadGameSceneSystem : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<LoadGameSceneTag>();
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+
+        Entities.
+            WithName("StartLoadGameSceneSystem").
+            WithAll<LoadGameSceneTag>().
+            ForEach((Entity gameManagerEntity) =>
+            {
+                ecb.RemoveComponent<LoadGameSceneTag>(gameManagerEntity);
+            }).Schedule();
+
+        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+    }
+}
+
 public class StartSpawnInitialObjects : SystemBase
 {
     private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
@@ -62,7 +150,7 @@ public class StartCreateInitialOperationsSystem : SystemBase
     }
 }
 
-public class StartGetPlayerActionsSystem : SystemBase
+public class FinishCreateOperationsSystem : SystemBase
 {
     private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
 
@@ -73,6 +161,35 @@ public class StartGetPlayerActionsSystem : SystemBase
         _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
         RequireSingletonForUpdate<CreateOperationsTag>();
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var gameManagerEntity = GetSingletonEntity<GameManagerTag>();
+        var operationsBuffer = GetBuffer<OperationAnswerBuffer>(gameManagerEntity);
+
+        if (operationsBuffer.Length > 0)
+        {
+            ecb.RemoveComponent<CreateOperationsTag>(gameManagerEntity);
+            ecb.AddComponent<FinishedCreateOperationsTag>(gameManagerEntity);
+        }
+
+        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+    }
+}
+
+public class FinishSpawnTargetsSystem : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<FinishedCreateOperationsTag>();
         RequireForUpdate(GetEntityQuery(new EntityQueryDesc
         {
             All = new [] {ComponentType.ReadOnly<TargetTag>()},
@@ -85,11 +202,43 @@ public class StartGetPlayerActionsSystem : SystemBase
         var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
-            WithName("StartGetPlayerActionsSystem").
-            WithAll<CreateOperationsTag>().
+            WithName("FinishSpawnTargetsSystem").
+            WithAll<FinishedCreateOperationsTag>().
             ForEach((Entity gameManagerEntity) =>
             {
-                ecb.RemoveComponent<CreateOperationsTag>(gameManagerEntity);
+                ecb.AddComponent<FinishedSpawnTargetsTag>(gameManagerEntity);
+            }).Schedule();
+        
+        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+    }
+}
+
+public class StartGetPlayerActionsSystem : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<FinishedCreateOperationsTag>();
+        RequireSingletonForUpdate<FinishedSpawnTargetsTag>();
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+
+        Entities.
+            WithName("StartGetPlayerActionsSystem").
+            WithAll<FinishedSpawnTargetsTag>().
+            ForEach((Entity gameManagerEntity) =>
+            {
+                ecb.RemoveComponent<FinishedCreateOperationsTag>(gameManagerEntity);
+                ecb.RemoveComponent<FinishedSpawnTargetsTag>(gameManagerEntity);
+
                 ecb.AddComponent<GetPlayerActionsTag>(gameManagerEntity);
             }).Schedule();
         

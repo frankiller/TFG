@@ -1,6 +1,5 @@
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
@@ -12,6 +11,7 @@ public struct TextMeshInternalData : IComponentData
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(BuildPhysicsWorld))]
+[UpdateAfter(typeof(OperationCreatorSystem))]
 public class TargetSpawnSystem : SystemBase
 {
     private EntityManager _entityManager;
@@ -26,7 +26,8 @@ public class TargetSpawnSystem : SystemBase
         _entityManager = currentWorld.EntityManager;
         _endFixedStepSimulationEntityCommandBuffer = currentWorld.GetOrCreateSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
         
-        RequireSingletonForUpdate<CreateOperationsTag>();
+        RequireSingletonForUpdate<FinishedCreateOperationsTag>();
+        RequireSingletonForUpdate<TargetPrefabConversion>();
     }
 
     protected override void OnStartRunning()
@@ -62,6 +63,7 @@ public class TargetSpawnSystem : SystemBase
                     {
                         ecb.AddComponent(newTarget, new IsCorrectTag());
                     }
+
                 }
 
                 operations.Clear();
@@ -78,10 +80,9 @@ public class TargetSpawnSystem : SystemBase
     }
 }
 
-[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
-[UpdateBefore(typeof(BuildPhysicsWorld))]
+[UpdateInGroup(typeof(LateSimulationSystemGroup))]
 [UpdateAfter(typeof(TargetSpawnSystem))]
-public class UpdateTargetDataSystem : SystemBase //Este tipo de sistemas deberían ejecutarse en el grupo LateSimulationSystemGroup
+public class UpdateTargetDataSystem : SystemBase
 {
     private EntityQuery _targetQuery;
     private EntityManager _entityManager;
@@ -106,8 +107,9 @@ public class UpdateTargetDataSystem : SystemBase //Este tipo de sistemas debería
         using var targetEntities = _targetQuery.ToEntityArray(Allocator.Temp);
         foreach (var targetEntity in targetEntities)
         {
-            _entityManager.GetComponentObject<TextMesh>(GetBuffer<LinkedEntityGroup>(targetEntity)[3].Value).text =
-                $"{GetComponent<TextMeshInternalData>(targetEntity).TextValue}";
+            var textMeshEntity = GetBuffer<LinkedEntityGroup>(targetEntity)[3].Value;
+            var textValue = GetComponent<TextMeshInternalData>(targetEntity).TextValue;
+            var tmp = _entityManager.GetComponentObject<TextMesh>(textMeshEntity).text = $"{textValue}";
 
             ecb.RemoveComponent<TextMeshInternalData>(targetEntity);
         }

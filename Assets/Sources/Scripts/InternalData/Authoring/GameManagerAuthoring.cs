@@ -9,8 +9,11 @@ public class GameManagerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
             new ComponentType[]
             {
                 typeof(GameManagerTag),
-                typeof(InitializeSystemsTag),
                 typeof(OperationAnswerBuffer),
+                typeof(PlayerScoreBuffer),
+                typeof(GameStartData),
+                typeof(LoadMenuSceneTag),
+                typeof(GameStateData)
             }
         ));
     }

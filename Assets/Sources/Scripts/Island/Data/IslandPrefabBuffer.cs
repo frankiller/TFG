@@ -1,8 +1,9 @@
-using System;
 using Unity.Entities;
+using Unity.Mathematics;
 
-[Serializable]
+[InternalBufferCapacity(6)]
 public struct IslandPrefabBuffer : IBufferElementData
 {
     public Entity Value;
+    public float3 CannonPosition;
 }

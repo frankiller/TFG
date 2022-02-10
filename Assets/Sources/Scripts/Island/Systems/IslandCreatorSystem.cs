@@ -18,13 +18,17 @@ public class IslandCreatorSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        var islandPrefabData =  GetSingleton<IslandPrefabData>();
+        UnityEngine.Debug.Log($"IslandCreatorSystem -> {islandPrefabData.NextPrefabIndex} - {islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[islandPrefabData.NextPrefabIndex].Value}");
+
         var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
         var islandSpawnerEntity = GetSingletonEntity<IslandSpawnerTag>();
         var islandSpawnOffset = GetSingleton<IslandSpawnOffsetAuthoring>().Value;
-        ref var islandPrefabArray = ref GetSingleton<IslandPrefabData>().BlobAssetReference.Value.IslandPrefabArray;
-        var random = new Random(1).NextInt(0, islandPrefabArray.Length);
-        var islandPrefab = islandPrefabArray[random].Value;
-        var cannonPosition = islandPrefabArray[random].CannonPosition;
+        //var random = new Random(1).NextInt(0, islandPrefabData.BlobAssetReference.Value.IslandPrefabBuffer.Length);
+        var islandPrefab = islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[islandPrefabData.NextPrefabIndex].Value;
+        var cannonPosition = islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[islandPrefabData.NextPrefabIndex].CannonPosition;
+
+        islandPrefabData.NextPrefabIndex++;
 
         Entities.
             WithName("IslandCreatorSystem").
@@ -55,23 +59,21 @@ public class UpdateIslandPrefabToSpawnSystem : SystemBase
     {
         base.OnCreate();
         _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireForUpdate(GetEntityQuery(ComponentType.ReadOnly<PositionPredictionData>()));
     }
 
     protected override void OnUpdate()
     {
         var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
         var islandPrefabData = GetSingleton<IslandPrefabData>();
-        ref var islandPrefabArray = ref islandPrefabData.BlobAssetReference.Value.IslandPrefabArray;
-        var random = new Random(1).NextInt(0, islandPrefabArray.Length);
-        var islandPrefab = islandPrefabArray[random].Value;
-        var cannonPosition = islandPrefabArray[random].CannonPosition;
+        //var random = ;
 
         Entities.
             WithChangeFilter<IslandSpawnSettings>().
             ForEach((Entity e) =>
         {
-            islandPrefabData.NextPrefab.Value = islandPrefab;
-            islandPrefabData.NextPrefab.CannonPosition = cannonPosition;
+            islandPrefabData.NextPrefabIndex = new Random(1).NextInt(0, islandPrefabData.BlobAssetReference.Value.IslandPrefabArray.Length);
 
             ecb.SetComponent(e, islandPrefabData);
         }).Schedule();

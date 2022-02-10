@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="FluffyMenus.uss" />
+    <ui:VisualElement name="main-menu-screen" class="screen">
+        <ui:VisualElement name="menu-center-panel" class="menu-center-panel menu-background">
+            <ui:VisualElement name="menu-start-title" style="background-image: url(&apos;/Assets/UI/Graphics/FluffyChickenLogo.png&apos;); height: 35%; width: 100%; min-height: 150px; -unity-background-scale-mode: scale-to-fit;" />
+            <ui:VisualElement name="menu-button-container" class="menu-button-container">
+                <ui:Button text="Iniciar juego" display-tooltip-when-elided="true" name="button-play" class="menu-button menu-button-top" />
+                <ui:Button text="Opciones" display-tooltip-when-elided="true" name="button-settings" class="menu-button menu-button-middle" />
+                <ui:Button text="Créditos" display-tooltip-when-elided="true" name="button-credits" class="menu-button menu-button-bottom" />
+            </ui:VisualElement>
+            <ui:VisualElement name="menu-scoreboard-container">
+                <ui:ListView focusable="true" name="listview-scoreboard" style="min-height: 100px; -unity-font-definition: none; -unity-font: url(&apos;/Assets/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf&apos;);" />
+                <ui:Label text="Máxima puntuación:&#x9;0" display-tooltip-when-elided="true" name="label-max-score" class="label label-override" style="-unity-text-outline-color: rgb(0, 0, 0); flex-wrap: wrap; white-space: normal;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

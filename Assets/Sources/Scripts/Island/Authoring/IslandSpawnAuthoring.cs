@@ -2,7 +2,6 @@ using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 [Serializable]
 public struct IslandSpawnSettings : ISpawnSettings, IComponentData
@@ -12,25 +11,46 @@ public struct IslandSpawnSettings : ISpawnSettings, IComponentData
     public quaternion Rotation { get; set; }
 }
 
-public class IslandSpawnAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+[UpdateInGroup(typeof(GameObjectAfterConversionGroup))]
+[UpdateAfter(typeof(IslandPrefabBlobAssetAuthoring))]
+public class IslandSpawnAuthoring : GameObjectConversionSystem
 {
-    public void Convert(Entity islandSpawner, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
-    {
-        dstManager.SetName(islandSpawner, $"{name}");
+    private EntityManager _entityManager;
+    private EntityQuery _islandSpawnerQuery;
 
-        var nextPrefab = dstManager.GetComponentData<IslandPrefabData>(islandSpawner).NextPrefab;
-        var islandSpawnOffset = dstManager.GetComponentData<IslandSpawnOffsetAuthoring>(islandSpawner).Value;
-        var newPosition = dstManager.GetComponentData<LocalToWorld>(nextPrefab.Value).Position - islandSpawnOffset;
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        _islandSpawnerQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<IslandSpawnerTag>());
+    }
+
+    protected override void OnUpdate()
+    {
+        if (_islandSpawnerQuery.IsEmptyIgnoreFilter) return;
+
+        var islandSpawnerEntity = _islandSpawnerQuery.GetSingletonEntity();
+        var islandPrefabData = _entityManager.GetComponentData<IslandPrefabData>(islandSpawnerEntity);
+        var nextPrefabIndex = islandPrefabData.NextPrefabIndex;
+        var nextPrefab = islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[nextPrefabIndex].Value;
+        var islandSpawnOffset = _entityManager.GetComponentData<IslandSpawnOffsetAuthoring>(islandSpawnerEntity).Value;
+        var newPosition = _entityManager.GetComponentData<LocalToWorld>(nextPrefab).Position - islandSpawnOffset;
+
+        _entityManager.AddComponentData(islandSpawnerEntity, new CannonPositionData
+        {
+            Value = islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[nextPrefabIndex].CannonPosition + newPosition
+        });
         
         var spawnSettings = new IslandSpawnSettings
         {
-            Prefab = nextPrefab.Value,
+            Prefab = nextPrefab,
             Position = newPosition,
-            Rotation = dstManager.GetComponentData<LocalToWorld>(nextPrefab.Value).Rotation
+            Rotation = _entityManager.GetComponentData<LocalToWorld>(nextPrefab).Rotation
         };
 
-        dstManager.AddComponentData(islandSpawner, new CannonPositionData { Value = nextPrefab.CannonPosition + newPosition });
-        dstManager.AddComponentData(islandSpawner, spawnSettings);
+        _entityManager.AddComponentData(islandSpawnerEntity, spawnSettings);
+        
     }
 }
 

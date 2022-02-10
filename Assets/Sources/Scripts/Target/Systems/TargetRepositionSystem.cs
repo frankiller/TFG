@@ -36,10 +36,6 @@ public class TargetRepositionSystem : SystemBase
             ForEach((Entity cannonballOnGround, int entityInQueryIndex) => ecb.DestroyEntity(entityInQueryIndex, cannonballOnGround)).
             ScheduleParallel(job1);
 
-        var gameInternalData = GetSingleton<OperationsInternalDataAuthoring>();
-        gameInternalData.CreateOperations = true;
-        _entityManager.SetComponentData(GetSingletonEntity<GameManagerTag>(), gameInternalData);
-
         _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(job2);
     }
 }

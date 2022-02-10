@@ -1,0 +1,257 @@
+.screen {
+    flex-grow: 1;
+}
+
+.screen-background {
+    background-image: url('/Assets/UI/Graphics/wood-background.jpg');
+}
+
+.menu-center-panel {
+    height: 100%;
+    width: 50%;
+    align-items: center;
+    justify-content: center;
+    left: 25%;
+}
+
+.menu-background {
+    background-color: rgba(0, 0, 0, 0.39);
+}
+
+.menu-button-container {
+    width: 50%;
+    min-width: 300px;
+}
+
+.menu-button {
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 30px;
+    color: rgb(200, 25, 25);
+    background-color: rgb(255, 175, 50);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    -unity-background-scale-mode: scale-and-crop;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
+    text-shadow: 2px 1px 1px rgb(0, 0, 0);
+    -unity-background-image-tint-color: rgb(254, 255, 250);
+    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
+    -unity-font-definition: resource('');
+}
+
+.menu-button:hover {
+    background-color: rgb(255, 175, 50);
+    -unity-background-image-tint-color: rgb(200, 25, 25);
+    background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.menu-button:active {
+    background-color: rgb(200, 25, 25);
+    background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
+    -unity-background-image-tint-color: rgb(255, 175, 50);
+    color: rgb(255, 175, 50);
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.menu-button-top {
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.menu-button-middle {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.menu-button-bottom {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 35px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 35px;
+}
+
+.label-override > .unity-base-field__label {
+    -unity-font-definition: none;
+    font-size: 30px;
+    color: rgb(200, 25, 25);
+    background-color: rgb(255, 175, 50);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    -unity-background-scale-mode: scale-and-crop;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
+    text-shadow: 2px 1px 1px rgb(0, 0, 0);
+    width: 100%;
+    height: 50px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
+    -unity-text-align: middle-center;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+}
+
+.label-override:hover > .unity-label:hover {
+    background-color: rgb(255, 175, 50);
+    -unity-background-image-tint-color: rgb(200, 25, 25);
+}
+
+.slider-tracker-override .unity-base-slider__tracker {
+    background-color: rgb(200, 25, 25);
+    margin-top: 10px;
+}
+
+.slider-dragger-border-override .unity-base-slider__dragger-border {
+    background-color: rgb(255, 175, 50);
+    border-left-width: 20px;
+    border-right-width: 20px;
+    border-top-width: 20px;
+    border-bottom-width: 20px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    margin-top: -4px;
+}
+
+.slider-dragger-override .unity-base-slider__dragger {
+    background-color: rgb(255, 175, 50);
+    background-image: url('/Assets/UI/Graphics/speaker.png');
+    width: 40px;
+    height: 40px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    margin-left: -4px;
+    margin-top: -18px;
+}
+
+.label {
+    color: rgb(200, 25, 25);
+    -unity-font-definition: none;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: 1px;
+    text-shadow: 2px 1px 1px rgb(0, 0, 0);
+    font-size: 30px;
+    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.foldout {
+    width: 100%;
+}
+
+.toolbar-text-element-override {
+    -unity-font-definition: none;
+    -unity-font: url('/Assets/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
+    font-size: 30px;
+    color: rgb(200, 25, 25);
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: 1px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    -unity-font-style: normal;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    flex-direction: row-reverse;
+    text-shadow: 2px 1px 0 rgb(0, 0, 0);
+}
+
+.toolbar-menu-override {
+    background-color: rgb(255, 175, 50);
+    background-image: url('/Assets/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
+    -unity-background-scale-mode: scale-and-crop;
+    width: 100%;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+}
+
+.toolbar-menu-arrow-override .unity-toolbar-menu__arrow {
+    background-image: url('/Assets/UI/Graphics/dropdown-arrow.png');
+    width: 10%;
+}
+
+.popup-field-arrow-override .unity-base-popup-field__arrow {
+    background-image: url('/Assets/UI/Graphics/dropdown-arrow.png');
+    width: 20px;
+    height: 20px;
+}
+
+.popup-field-input-override .unity-base-popup-field__input {
+    background-color: rgb(255, 175, 50);
+}
+
+.popup-field-text-override .unity-base-popup-field__text {
+    -unity-font-definition: none;
+    font-size: 20px;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    text-shadow: 2px 1px 1px rgb(0, 0, 0);
+    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
+    -unity-text-align: middle-center;
+}
+
+.popup-field-label-override .unity-base-field__label {
+    -unity-font-definition: none;
+    font-size: 30px;
+    color: rgb(200, 25, 25);
+    -unity-text-outline-color: rgb(0, 0, 0);
+    text-shadow: 2px 1px 1px rgb(0, 0, 0);
+    -unity-text-outline-width: 1px;
+    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
+    -unity-text-align: middle-center;
+}
+
+.button-control {
+    -unity-background-image-tint-color: rgb(200, 25, 25);
+    background-color: rgb(255, 175, 50);
+    -unity-background-scale-mode: scale-and-crop;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    width: 75px;
+    height: 75px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}

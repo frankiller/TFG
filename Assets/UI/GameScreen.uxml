@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style src="FluffyMenus.uss" />
+    <ui:VisualElement name="game-screen" class="screen" style="flex-basis: 1px; overflow: hidden;">
+        <ui:VisualElement name="operation-container" style="justify-content: center; align-items: center; width: 100%; position: absolute; min-height: 200px;">
+            <ui:Label text="Operation text" display-tooltip-when-elided="true" name="label-operation" class="label" />
+            <ui:Label text="Correcto!!" name="label-succeed" style="font-size: 70px; -unity-font-style: bold; -unity-font-definition: resource(&apos;&apos;); color: rgb(255, 175, 50); -unity-text-align: middle-center; -unity-text-outline-width: 5px; -unity-text-outline-color: rgb(200, 25, 25); text-shadow: 4px 2px 5px rgb(255, 175, 50); letter-spacing: 5px; display: none; -unity-font: url(&apos;/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf&apos;);" />
+        </ui:VisualElement>
+        <ui:VisualElement name="crosshair-container" style="align-items: center; justify-content: center; flex-grow: 1; overflow: visible; width: 100%; height: 100%;">
+            <ui:VisualElement name="crosshair" style="background-image: url(&apos;/Assets/UI/Graphics/crosshair.png&apos;); width: 50px; height: 50px; align-items: center; justify-content: center;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="button-menu-container" style="width: 50%; height: 50px; position: absolute; bottom: 30px; flex-direction: row; right: 30px; left: 30px;">
+            <ui:Button text="&#x9;" display-tooltip-when-elided="true" name="button-menu" style="width: 50px; height: 50px; background-image: url(&apos;/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Sprite/Demo/Demo_Icon_ItemIcons(Original)/Icon_GearWheels.Png&apos;); background-color: rgb(255, 175, 50); border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="controls-container" style="right: 30px; bottom: 30px; width: 150px; height: 150px; position: absolute;" />
+    </ui:VisualElement>
+</ui:UXML>

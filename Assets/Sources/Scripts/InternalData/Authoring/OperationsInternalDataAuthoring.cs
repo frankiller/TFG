@@ -4,5 +4,4 @@ using Unity.Entities;
 public struct OperationsInternalDataAuthoring : IComponentData
 {
     public int OperationRange;
-    public bool CreateOperations;
 }

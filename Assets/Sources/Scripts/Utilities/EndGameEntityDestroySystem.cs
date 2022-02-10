@@ -1,5 +1,4 @@
 using Unity.Entities;
-using Unity.Physics;
 
 [UpdateInGroup(typeof(LateSimulationSystemGroup))]
 [UpdateBefore(typeof(EndSimulationEntityCommandBufferSystem))]
@@ -12,19 +11,17 @@ public class EndGameEntityDestroySystem : SystemBase
         base.OnCreate();
 
         _endFixedStepSimulationEntityCommandBuffer = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<DeactivateSystemsTag>();
     }
 
     protected override void OnUpdate()
     {
-        if (!GameManager.IsGameOver()) { return; }
-
-        var ecs = _endFixedStepSimulationEntityCommandBuffer
-            .CreateCommandBuffer()
-            .AsParallelWriter();
+        var ecs = _endFixedStepSimulationEntityCommandBuffer.CreateCommandBuffer().AsParallelWriter();
 
         Entities
             .WithName("EntityDestroy")
-            .WithAny<TargetPrefabConversion, TargetTag, PhysicsCollider>()
+            .WithEntityQueryOptions(EntityQueryOptions.IncludePrefab)
             .ForEach((Entity targetPrefab, int entityInQueryIndex) => ecs.DestroyEntity(entityInQueryIndex, targetPrefab)).ScheduleParallel();
 
         _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(Dependency);

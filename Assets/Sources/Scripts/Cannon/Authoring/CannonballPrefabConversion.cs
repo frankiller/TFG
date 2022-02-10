@@ -1,7 +1,7 @@
 using Unity.Entities;
 
 [GenerateAuthoringComponent]
-public class CannonballPrefabConversion : IComponentData
+public struct CannonballPrefabConversion : IComponentData
 {
     public Entity CannonballPrefab;
 }

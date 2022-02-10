@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="MainMenuScreen" src="MainMenuScreen.uxml" />
+    <ui:Template name="SettingsScreen" src="SettingsScreen.uxml" />
+    <ui:Template name="CreditsScreen" src="CreditsScreen.uxml" />
+    <Style src="FluffyMenus.uss" />
+    <MenuScreenManager class="screen">
+        <ui:Instance template="MainMenuScreen" name="MainMenuScreen" style="flex-grow: 1; display: none;" />
+        <ui:Instance template="SettingsScreen" name="SettingsScreen" style="flex-grow: 1; display: none;" />
+        <ui:Instance template="CreditsScreen" name="CreditsScreen" style="flex-grow: 1; display: none;" />
+    </MenuScreenManager>
+</ui:UXML>

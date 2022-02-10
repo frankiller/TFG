@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="FluffyMenus.uss" />
+    <ui:VisualElement name="credits-screen" class="screen screen-background">
+        <ui:Label text="Hecho por Franky blablablablabla blablabla blabla" display-tooltip-when-elided="true" name="label-credits" class="label" style="white-space: normal; top: 100px;" />
+        <ui:VisualElement name="button-container" style="bottom: auto; top: 50%;">
+            <ui:Button text="Volver" display-tooltip-when-elided="true" name="button-back" class="menu-button menu-button-top" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

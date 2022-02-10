@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="FluffyMenus.uss" />
+    <NewGameScreen style="flex-grow: 1;">
+        <ui:VisualElement name="new-game-screen" class="screen screen-background">
+            <ui:VisualElement name="menu-center-panel" class="menu-background menu-center-panel">
+                <ui:DropdownField label="Modo de juego" name="dropdown-game-mode" choices="Sumas y restas,Multiplicaciones y divisiones,Multioperando,Álgebra" class="popup-field-arrow-override popup-field-input-override popup-field-text-override popup-field-label-override" style="align-items: center; -unity-text-align: middle-left; justify-content: flex-start; flex-wrap: wrap; margin-top: 10px; margin-bottom: 10px; flex-direction: column;" />
+                <ui:DropdownField index="0" name="dropdown-game-difficulty" label="Nivel de dificultad" choices="Fácil,Intermedio,Difícil" class="popup-field-arrow-override popup-field-input-override popup-field-text-override popup-field-label-override" style="color: rgb(200, 25, 25); -unity-text-align: middle-left; align-items: center; flex-direction: column; margin-top: 10px; margin-bottom: 10px;" />
+                <ui:Foldout text="Modo de juego" name="foldout-game-mode" value="false" class="label foldout" style="display: none;" />
+                <ui:Foldout text="Nivel de dificultad" name="foldout-game-difficulty" value="false" class="label foldout" style="display: none;" />
+                <ui:Label text="Máxima puntuación:&#x9;0" display-tooltip-when-elided="true" name="label-max-score" class="label label-override" style="-unity-text-outline-color: rgb(0, 0, 0); flex-wrap: wrap; white-space: normal;" />
+                <ui:VisualElement name="menu-button-container" class="menu-button-container" style="flex-direction: row; justify-content: center; margin-top: 10px; margin-bottom: 10px;">
+                    <ui:Button text="Volver" display-tooltip-when-elided="true" name="button-back" class="menu-button" />
+                    <ui:Button text="Jugar" display-tooltip-when-elided="true" name="button-play" class="menu-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </NewGameScreen>
+</ui:UXML>

@@ -5,5 +5,5 @@ using Unity.Entities;
 public struct IslandPrefabData : IComponentData
 {
     public BlobAssetReference<IslandPrefabBlobAsset> BlobAssetReference;
-    public IslandPrefab NextPrefab;
+    public int NextPrefabIndex;
 }

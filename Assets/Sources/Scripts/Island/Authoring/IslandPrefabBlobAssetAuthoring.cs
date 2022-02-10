@@ -1,33 +1,32 @@
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
-[DisallowMultipleComponent]
-public class IslandPrefabBlobAssetAuthoring : MonoBehaviour, IConvertGameObjectToEntity, IDeclareReferencedPrefabs
+public class IslandPrefabBlobAssetAuthoring : MonoBehaviour, IConvertGameObjectToEntity
 {
-    public List<GameObject> IslandPrefabs;
-
-    public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+    public void Convert(Entity islandSpawnerEntity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
+        
         using var blobBuilder = new BlobBuilder(Allocator.Temp);
         ref var islandPrefabBlobAsset = ref blobBuilder.ConstructRoot<IslandPrefabBlobAsset>();
-        var islandPrefabArray = blobBuilder.Allocate(ref islandPrefabBlobAsset.IslandPrefabArray, 6);
+        var islandPrefabArray = blobBuilder.Allocate(ref islandPrefabBlobAsset.IslandPrefabArray, 1);
 
-        for (int i = 0; i < IslandPrefabs.Count; i++)
+        var buffer = dstManager.GetBuffer<IslandPrefabBuffer>(islandSpawnerEntity);
+        for (int i = 0; i < 1; i++)
         {
-            islandPrefabArray[i].Value = conversionSystem.GetPrimaryEntity(IslandPrefabs[i].gameObject);
-            islandPrefabArray[i].CannonPosition = IslandPrefabs[i].transform.GetChild(0).localPosition;
+            islandPrefabArray[i] = new IslandPrefab
+            {
+                Value = buffer[i].Value,
+                CannonPosition = buffer[i].CannonPosition
+            };
         }
 
         var islandPrefabBlobAssetReference = blobBuilder.CreateBlobAssetReference<IslandPrefabBlobAsset>(Allocator.Persistent);
 
-        dstManager.AddComponentData(entity, new IslandPrefabData
+        dstManager.AddComponentData(islandSpawnerEntity, new IslandPrefabData
         {
             BlobAssetReference = islandPrefabBlobAssetReference,
-            NextPrefab = islandPrefabArray[0]
+            NextPrefabIndex = 0
         });
     }
-
-    public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs) => referencedPrefabs.AddRange(IslandPrefabs);
 }

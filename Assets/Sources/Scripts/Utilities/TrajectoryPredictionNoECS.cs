@@ -1,7 +1,7 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class TrajectoryPredictionNoECS : ScriptableObject
+public class TrajectoryPredictionNoECS
 {
     public float3 Predict(float3 currentPosition, Vector3 direction)
     {

@@ -1,15 +1,15 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Questions : ScriptableObject
+public class Questions
 {
-    public int optionsRange = 5;
+    public int OptionsRange = 5;
     public int[] AnswerList;
-    public string operationText;
+    public string OperationText;
     
-    private void Awake()
+    public Questions()
     {
-        AnswerList = new int[optionsRange];
+        AnswerList = new int[OptionsRange];
     }
 
     public int SumOrMinusOperation()
@@ -20,14 +20,12 @@ public class Questions : ScriptableObject
         var isSumOrSubtractionOperation = Mathf.FloorToInt(Random.value * 2);
         if (isSumOrSubtractionOperation == 0)
         {
-            operationText = $"{operand1} + {operand2}";
+            OperationText = $"{operand1} + {operand2}";
             return operand1 + operand2;
         }
-        else
-        {
-            operationText = $"{operand1} - {operand2}";
-            return operand1 - operand2;
-        }
+
+        OperationText = $"{operand1} - {operand2}";
+        return operand1 - operand2;
     }
 
     public int MultiplyOperation()
@@ -35,7 +33,7 @@ public class Questions : ScriptableObject
         var operand1 = Mathf.FloorToInt(Random.value * 50);
         var operand2 = Random.Range(2, 10);
 
-        operationText = $"{operand1} * {operand2}";
+        OperationText = $"{operand1} * {operand2}";
         return operand1 * operand2;
     }
 
@@ -48,14 +46,12 @@ public class Questions : ScriptableObject
         var isSumOrSubtractionOperation = Mathf.FloorToInt(Random.value * 2);
         if (isSumOrSubtractionOperation == 0)
         {
-            operationText = $"({operand1} + {operand2}) * {operand3}";
+            OperationText = $"({operand1} + {operand2}) * {operand3}";
             return (operand1 + operand2) * operand3;
         }
-        else
-        {
-            operationText = $"({operand1} - {operand2}) * {operand3}";
-            return (operand1 - operand2) * operand3;
-        }
+
+        OperationText = $"({operand1} - {operand2}) * {operand3}";
+        return (operand1 - operand2) * operand3;
     }
 
     public int AlgebraicOperation()
@@ -66,7 +62,7 @@ public class Questions : ScriptableObject
 
         var isSumOrSubtractionOperation = Mathf.FloorToInt(Random.value * 2);
        
-        operationText = isSumOrSubtractionOperation == 0 
+        OperationText = isSumOrSubtractionOperation == 0 
             ? $"{operand1}x + {operand2} = {operand1 * answer + operand2}" 
             : $"{operand1}x - {operand2} = {operand1 * answer - operand2}";
 
@@ -77,9 +73,9 @@ public class Questions : ScriptableObject
     {
         ClearAnswerList();
 
-        var correctAnswerIndex = Mathf.FloorToInt(Random.value * optionsRange);
+        var correctAnswerIndex = Mathf.FloorToInt(Random.value * OptionsRange);
 
-        for (var i = 0; i < optionsRange; i++)
+        for (var i = 0; i < OptionsRange; i++)
         {
             if (i == correctAnswerIndex)
             {
@@ -113,6 +109,6 @@ public class Questions : ScriptableObject
 
     private void ClearAnswerList()
     {
-        AnswerList = new int[optionsRange];
+        AnswerList = new int[OptionsRange];
     }
 }

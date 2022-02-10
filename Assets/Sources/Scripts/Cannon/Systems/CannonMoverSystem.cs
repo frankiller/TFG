@@ -27,45 +27,13 @@ public class CannonMoverSystem : SystemBase
     private float _currentXRotation;
     private float _currentXEulerRotation;
 
-    private float GetXInput
-    {
-        get
-        {
-            _inputLagTimer += Time.DeltaTime;
-
-            var input = Input.GetAxis("Mouse X");
-
-            if (Mathf.Approximately(0, input) && !(_inputLagTimer >= _inputLagPeriod)) return _lastXInputEvent;
-            _lastXInputEvent = input;
-            _inputLagTimer = 0f;
-
-            return _lastXInputEvent;
-        }
-    }
-
-    private float GetYInput
-    {
-        get
-        {
-            _inputLagTimer += Time.DeltaTime;
-
-            var input = Input.GetAxis("Mouse Y");
-
-            if (Mathf.Approximately(0, input) && !(_inputLagTimer >= _inputLagPeriod)) return _lastYInputEvent;
-            _lastYInputEvent = input;
-            _inputLagTimer = 0f;
-
-            return _lastYInputEvent;
-        }
-    }
-
     protected override void OnCreate()
     {
         base.OnCreate();
 
         RequireSingletonForUpdate<GetPlayerActionsTag>();
+        RequireSingletonForUpdate<RawInputData>();
     }
-
 
     protected override void OnStartRunning()
     {
@@ -101,7 +69,8 @@ public class CannonMoverSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        var yRotation = GetYRotationToMouse();
+        var rawInputData = GetSingleton<RawInputData>();
+        var yRotation = GetYRotationToMouse(GetYInput(rawInputData.XInput));
         
         var baseEntity = CannonHelper.GetCannonBase(_entityManager);
         var fromRotation = _entityManager.GetComponentData<Rotation>(baseEntity).Value;
@@ -110,22 +79,44 @@ public class CannonMoverSystem : SystemBase
 
         var barrelEntity = CannonHelper.GetCannonBarrel(_entityManager);
         fromRotation = _entityManager.GetComponentData<Rotation>(barrelEntity).Value;
-        toRotation = quaternion.Euler(GetXRotationToMouse(), yRotation, 0f);
+        toRotation = quaternion.Euler(GetXRotationToMouse(GetXInput(rawInputData.YInput)), yRotation, 0f);
         _entityManager.SetComponentData(barrelEntity, new Rotation { Value = Quaternion.Lerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
     }
 
-    private float GetYRotationToMouse()
+    private float GetXInput(float xInput)
     {
-        _currentYVelocity = Mathf.MoveTowards(_currentYVelocity, GetXInput * _turnSpeed, _acceleration * Time.DeltaTime);
+        _inputLagTimer += Time.DeltaTime;
+
+        if (Mathf.Approximately(0, xInput) && !(_inputLagTimer >= _inputLagPeriod)) return _lastXInputEvent;
+        _lastXInputEvent = xInput;
+        _inputLagTimer = 0f;
+
+        return _lastXInputEvent;
+    }
+
+    private float GetYInput(float yInput)
+    {
+        _inputLagTimer += Time.DeltaTime;
+
+        if (Mathf.Approximately(0, yInput) && !(_inputLagTimer >= _inputLagPeriod)) return _lastYInputEvent;
+        _lastYInputEvent = yInput;
+        _inputLagTimer = 0f;
+
+        return _lastYInputEvent;
+    }
+
+    private float GetYRotationToMouse(float yInput)
+    {
+        _currentYVelocity = Mathf.MoveTowards(_currentYVelocity, yInput * _turnSpeed, _acceleration * Time.DeltaTime);
 
         _currentYRotation += _currentYVelocity * Time.DeltaTime;
 
         return _currentYRotation;
     }
 
-    private float GetXRotationToMouse()
+    private float GetXRotationToMouse(float xInput)
     {
-        _currentXVelocity = Mathf.MoveTowards(_currentXVelocity, GetYInput * _turnSpeed, _acceleration * Time.DeltaTime);
+        _currentXVelocity = Mathf.MoveTowards(_currentXVelocity, xInput * _turnSpeed, _acceleration * Time.DeltaTime);
 
         _currentXRotation -= _currentXVelocity * Time.DeltaTime;
         _currentXRotation = ClampVerticalAngle(_currentXRotation);
