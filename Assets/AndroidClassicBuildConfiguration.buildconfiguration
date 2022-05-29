@@ -1,0 +1,55 @@
+{
+    "Dependencies": [],
+    "Components": [
+        {
+            "$type": "Unity.Build.Common.GeneralSettings, Unity.Build",
+            "ProductName": "FluffyChicken",
+            "CompanyName": "FranciscoGarciaAldehuela",
+            "Version": "0.0.1.0"
+        },
+        {
+            "$type": "Unity.Build.Common.SceneList, Unity.Build",
+            "$version": 1,
+            "BuildCurrentScene": false,
+            "SceneInfos": [
+                {
+                    "Scene": "GlobalObjectId_V1-1-61b1b6496e1a1054d92d38e13b73b135-102900000-0",
+                    "AutoLoad": true
+                }
+            ]
+        },
+        {
+            "$type": "Unity.Build.Classic.ClassicBuildProfile, Unity.Build.Classic",
+            "$version": 1,
+            "Platform": "android",
+            "Configuration": 3
+        },
+        {
+            "$type": "Unity.Build.DotsRuntime.DotsRuntimeBuildProfile, Unity.Build.DotsRuntime",
+            "Target": {
+                "$type": "Unity.Build.Android.DotsRuntime.AndroidBuildTarget, Unity.Build.Android.DotsRuntime"
+            },
+            "Configuration": 3,
+            "UseNewPipeline": false,
+            "PipelineConstructor": null
+        },
+        {
+            "$type": "Unity.Build.Classic.ClassicScriptingSettings, Unity.Build.Classic",
+            "ScriptingBackend": 1,
+            "Il2CppCompilerConfiguration": 1,
+            "UseIncrementalGC": true
+        },
+        {
+            "$type": "Unity.Build.Common.ScreenOrientations, Unity.Build",
+            "DefaultOrientation": 3,
+            "AllowAutoRotateToPortrait": true,
+            "AllowAutoRotateToReversePortrait": true,
+            "AllowAutoRotateToLandscape": true,
+            "AllowAutoRotateToReverseLandscape": true
+        },
+        {
+            "$type": "Unity.Build.Common.GraphicsSettings, Unity.Build",
+            "ColorSpace": 1
+        }
+    ]
+}

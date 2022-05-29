@@ -10,20 +10,29 @@ public class CameraOnCannonSystem : SystemBase
 
         _endFixedStepSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
 
-        RequireSingletonForUpdate<CannonballHitOnIslandTag>();
+        RequireForUpdate(GetEntityQuery(new EntityQueryDesc
+        {
+            All = new[] { ComponentType.ReadOnly<GameManagerTag>() },
+            Any = new[]
+            {
+                ComponentType.ReadOnly<CannonballHitOnIslandTag>(),
+                ComponentType.ReadOnly<CannonballMisshitTag>()
+            }
+        }));
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endFixedStepSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _endFixedStepSimulationEntityCommandBufferSystem.CreateCommandBuffer().AsParallelWriter();
         var cannonMuzzleEntity = GetSingletonEntity<CannonMuzzleTag>();
 
-        Entities.WithName("CameraOnCannonSystem").ForEach(
-            (Entity cameraEntity, ref CameraTargetEntityData cameraTargetEntity) =>
+        Entities.
+            WithName("CameraOnCannonSystem").
+            ForEach((Entity cameraEntity, int entityInQueryIndex, ref CameraTargetEntityData cameraTargetEntity) =>
             {
                 cameraTargetEntity.Value = cannonMuzzleEntity;
-                ecb.SetComponent(cameraEntity, cameraTargetEntity);
-            }).Schedule();
+                ecb.SetComponent(entityInQueryIndex, cameraEntity, cameraTargetEntity);
+            }).ScheduleParallel();
 
         _endFixedStepSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
     }

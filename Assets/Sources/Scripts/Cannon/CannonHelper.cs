@@ -6,19 +6,22 @@ public static class CannonHelper
 {
     public static Entity GetCannonBase(EntityManager entityManager)
     {
-        return entityManager.GetBuffer<LinkedEntityGroup>(entityManager.CreateEntityQuery(typeof(CannonTag))
+        return entityManager.GetBuffer<LinkedEntityGroup>(entityManager
+            .CreateEntityQuery(ComponentType.ReadOnly<CannonTag>())
             .GetSingletonEntity())[1].Value;
     }
 
     public static Entity GetCannonBarrel(EntityManager entityManager)
     {
-        return entityManager.GetBuffer<LinkedEntityGroup>(entityManager.CreateEntityQuery(typeof(CannonTag))
+        return entityManager.GetBuffer<LinkedEntityGroup>(entityManager
+            .CreateEntityQuery(ComponentType.ReadOnly<CannonTag>())
             .GetSingletonEntity())[2].Value;
     }
 
     public static Entity GetCannonMuzzle(EntityManager entityManager)
     {
-        return entityManager.GetBuffer<LinkedEntityGroup>(entityManager.CreateEntityQuery(typeof(CannonTag))
+        return entityManager.GetBuffer<LinkedEntityGroup>(entityManager
+            .CreateEntityQuery(ComponentType.ReadOnly<CannonTag>())
             .GetSingletonEntity())[3].Value;
     }
 
@@ -26,13 +29,13 @@ public static class CannonHelper
     {
         return entityManager.GetComponentData<Translation>(
             entityManager.GetBuffer<LinkedEntityGroup>(
-            entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity())[2].Value).Value;
+                entityManager.CreateEntityQuery(ComponentType.ReadOnly<CannonTag>()).GetSingletonEntity())[2].Value).Value;
     }
 
     public static quaternion GetCannonBarrelRotation(EntityManager entityManager)
     {
         return entityManager.GetComponentData<Rotation>(
             entityManager.GetBuffer<LinkedEntityGroup>(
-                entityManager.CreateEntityQuery(typeof(CannonTag)).GetSingletonEntity())[2].Value).Value;
+                entityManager.CreateEntityQuery(ComponentType.ReadOnly<CannonTag>()).GetSingletonEntity())[2].Value).Value;
     }
 }

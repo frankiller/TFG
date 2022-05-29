@@ -5,12 +5,6 @@ public class GameScreenManager : VisualElement
 {
     public new class UxmlFactory : UxmlFactory<GameScreenManager, UxmlTraits> { }
 
-    private EntityManager _entityManager;
-    private EntityQuery _menuManagerEntityQuery;
-
-    private VisualElement _gameScreen;
-    private VisualElement _pauseScreen;
-
     public GameScreenManager()
     {
         RegisterCallback<GeometryChangedEvent>(OnGeometryChange);
@@ -20,60 +14,57 @@ public class GameScreenManager : VisualElement
     {
         if (World.DefaultGameObjectInjectionWorld == null) return;
 
-        _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        _menuManagerEntityQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<MenuManagerTag>());
-
-        if (_menuManagerEntityQuery.IsEmptyIgnoreFilter) return;
-
-        _gameScreen = this.Q("GameScreen");
-        _pauseScreen = this.Q("GamePauseScreen");
-
         AddComponentsToMenuManagerEntity();
-
-        RegisterCallbackOnMenuButton();
-        RegisterCallbackOnPauseMenuButtons();
 
         UnregisterCallback<GeometryChangedEvent>(OnGeometryChange);
     }
 
     private void AddComponentsToMenuManagerEntity()
     {
-        var operationLabel = _gameScreen?.Q<Label>("label-operation");
-        var succeedLabel = _gameScreen?.Q<Label>("label-succeed");
-        var crosshair = _gameScreen?.Q("crosshair");
+        var entityManager = EntityManagerHelper.GetEntityManager();
+        var menuManagerEntity = EntityManagerHelper.GetMenuManagerEntity();
+        var gameScreen = this.Q("GameScreen");
 
-        var menuManagerEntity = _menuManagerEntityQuery.GetSingletonEntity();
+        var chronometerLabel = gameScreen.Q<Label>("label-chrono");
+        if (entityManager.HasComponent<UiChronometerTextData>(menuManagerEntity))
+        {
+            chronometerLabel.text = entityManager.GetComponentObject<UiChronometerTextData>(menuManagerEntity).Value.text;
+        }
 
-        _entityManager.AddComponentObject(menuManagerEntity, new UiOperationTextData {Value = operationLabel, Radius = 15});
-        _entityManager.AddComponentObject(menuManagerEntity, new UiSuccessTextData {Value = succeedLabel});
-        _entityManager.AddComponentObject(menuManagerEntity, new UiCrosshairData {Value = crosshair});
-    }
+        //Comprobar si en vez de un new ...Data es mejor hacer un GetComponentObject y actualizar su valor
+        entityManager.AddComponentObject(menuManagerEntity, new UiChronometerTextData { Value = chronometerLabel });
 
-    private void RegisterCallbackOnMenuButton()
-    {
-        _gameScreen?.Q<Button>("button-menu")?.RegisterCallback<ClickEvent>(e => EnableGamePauseScreen());
-    }
+        var operationLabel = gameScreen.Q<Label>("label-operation");
+        if (entityManager.HasComponent<UiOperationTextData>(menuManagerEntity))
+        {
+            operationLabel.text = entityManager.GetComponentObject<UiOperationTextData>(menuManagerEntity).Value.text;
+        }
 
-    private void RegisterCallbackOnPauseMenuButtons()
-    {
-        _pauseScreen?.Q<Button>("button-back-play")?.RegisterCallback<ClickEvent>(e => EnableGameScreen());
-        _pauseScreen?.Q<Button>("button-back")?.RegisterCallback<ClickEvent>(e => EnableMainMenuScreen());
-    }
+        entityManager.AddComponentObject(menuManagerEntity, new UiOperationTextData { Value = operationLabel });
 
-    private void EnableMainMenuScreen()
-    {
-        _entityManager.AddComponentData(_entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameManagerTag>()).GetSingletonEntity(), new ReloadMenuSceneTag());
-    }
+        var scoreLabel = gameScreen.Q<Label>("label-score");
+        if (entityManager.HasComponent<UiScoreTextData>(menuManagerEntity))
+        {
+            scoreLabel.text = entityManager.GetComponentObject<UiScoreTextData>(menuManagerEntity).Value.text;
+        }
+        else
+        {
+            scoreLabel.text += entityManager.GetComponentData<MaxAllowedScoreData>(
+                EntityManagerHelper.GetGameManagerEntity()).Value.ToString();
+        }
 
-    private void EnableGamePauseScreen()
-    {
-        _gameScreen.style.display = DisplayStyle.None;
-        _pauseScreen.style.display = DisplayStyle.Flex;
-    }
+        entityManager.AddComponentObject(menuManagerEntity, new UiScoreTextData { Value = scoreLabel });
 
-    private void EnableGameScreen()
-    {
-        _gameScreen.style.display = DisplayStyle.Flex;
-        _pauseScreen.style.display = DisplayStyle.None;
+        var succeedLabel = gameScreen.Q<Label>("label-succeed");
+        entityManager.AddComponentObject(menuManagerEntity, new UiSuccessTextData { Value = succeedLabel });
+
+        var succeedNextIslandLabel = gameScreen.Q<Label>("label-next-island");
+        entityManager.AddComponentObject(menuManagerEntity, new UiSuccessNextIslandTextData { Value = succeedNextIslandLabel });
+
+        var failureLabel = gameScreen.Q<Label>("label-failure");
+        entityManager.AddComponentObject(menuManagerEntity, new UiFailureTextData { Value = failureLabel });
+
+        var crosshair = gameScreen.Q("crosshair");
+        entityManager.AddComponentObject(menuManagerEntity, new UiCrosshairData { Value = crosshair });
     }
 }

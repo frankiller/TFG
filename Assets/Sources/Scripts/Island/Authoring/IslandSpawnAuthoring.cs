@@ -9,6 +9,7 @@ public struct IslandSpawnSettings : ISpawnSettings, IComponentData
     public Entity Prefab { get; set; }
     public float3 Position { get; set; }
     public quaternion Rotation { get; set; }
+    public bool IsFirstIsland { get; set; }
 }
 
 [UpdateInGroup(typeof(GameObjectAfterConversionGroup))]
@@ -28,7 +29,7 @@ public class IslandSpawnAuthoring : GameObjectConversionSystem
 
     protected override void OnUpdate()
     {
-        if (_islandSpawnerQuery.IsEmptyIgnoreFilter) return;
+        if (_islandSpawnerQuery.IsEmpty) return;
 
         var islandSpawnerEntity = _islandSpawnerQuery.GetSingletonEntity();
         var islandPrefabData = _entityManager.GetComponentData<IslandPrefabData>(islandSpawnerEntity);
@@ -46,7 +47,8 @@ public class IslandSpawnAuthoring : GameObjectConversionSystem
         {
             Prefab = nextPrefab,
             Position = newPosition,
-            Rotation = _entityManager.GetComponentData<LocalToWorld>(nextPrefab).Rotation
+            Rotation = _entityManager.GetComponentData<LocalToWorld>(nextPrefab).Rotation,
+            IsFirstIsland = true
         };
 
         _entityManager.AddComponentData(islandSpawnerEntity, spawnSettings);

@@ -11,13 +11,13 @@ public class IslandPrefabBlobAssetAuthoring : MonoBehaviour, IConvertGameObjectT
         ref var islandPrefabBlobAsset = ref blobBuilder.ConstructRoot<IslandPrefabBlobAsset>();
         var islandPrefabArray = blobBuilder.Allocate(ref islandPrefabBlobAsset.IslandPrefabArray, 1);
 
-        var buffer = dstManager.GetBuffer<IslandPrefabBuffer>(islandSpawnerEntity);
-        for (int i = 0; i < 1; i++)
+        var islandPrefabBuffer = dstManager.GetBuffer<IslandPrefabBuffer>(islandSpawnerEntity);
+        for (int i = 0; i < islandPrefabBuffer.Length; i++)
         {
             islandPrefabArray[i] = new IslandPrefab
             {
-                Value = buffer[i].Value,
-                CannonPosition = buffer[i].CannonPosition
+                Value = islandPrefabBuffer[i].Value,
+                CannonPosition = islandPrefabBuffer[i].CannonPosition
             };
         }
 

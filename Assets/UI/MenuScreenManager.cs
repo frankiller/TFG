@@ -1,4 +1,3 @@
-using Unity.Entities;
 using UnityEngine.UIElements;
 
 public class MenuScreenManager : VisualElement
@@ -17,28 +16,25 @@ public class MenuScreenManager : VisualElement
     private void OnGeometryChange(GeometryChangedEvent evt)
     {
         _mainMenuScreen = this.Q("MainMenuScreen");
-        _mainMenuScreen?.Q("button-play")?.RegisterCallback<ClickEvent>(e => EnablePlayGame());
-        _mainMenuScreen?.Q("button-settings")?.RegisterCallback<ClickEvent>(e => EnableSettingsScreen());
-        _mainMenuScreen?.Q("button-credits")?.RegisterCallback<ClickEvent>(e => EnableCreditsScreen());
+        _mainMenuScreen?.Q("button-play")?.RegisterCallback<ClickEvent>(_ => EnablePlayGame());
+        _mainMenuScreen?.Q("button-settings")?.RegisterCallback<ClickEvent>(_ => EnableSettingsScreen());
+        _mainMenuScreen?.Q("button-credits")?.RegisterCallback<ClickEvent>(_ => EnableCreditsScreen());
 
         _settingsScreen = this.Q("SettingsScreen");
-        _settingsScreen?.Q("button-back")?.RegisterCallback<ClickEvent>(e => EnableMainMenuScreen());
+        _settingsScreen?.Q("button-back")?.RegisterCallback<ClickEvent>(_ => EnableMainMenuScreen());
 
         _creditsScreen = this.Q("CreditsScreen");
-        _creditsScreen?.Q("button-back")?.RegisterCallback<ClickEvent>(e => EnableMainMenuScreen());
+        _creditsScreen?.Q("button-back")?.RegisterCallback<ClickEvent>(_ => EnableMainMenuScreen());
 
         UnregisterCallback<GeometryChangedEvent>(OnGeometryChange);
     }
 
-    private void EnablePlayGame()
+    private static void EnablePlayGame()
     {
-        var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        var gameManagerEntityQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameManagerTag>());
-
-        if (gameManagerEntityQuery.IsEmptyIgnoreFilter) return;
-
-        entityManager.AddComponentData(gameManagerEntityQuery.GetSingletonEntity(), new LoadGameSceneTag());
-        entityManager.AddComponentData(gameManagerEntityQuery.GetSingletonEntity(), new InitializeSystemsTag());
+        var entityManager = EntityManagerHelper.GetEntityManager();
+        var gameManagerEntity = EntityManagerHelper.GetGameManagerEntity();
+        entityManager.AddComponentData(gameManagerEntity, new LoadGameTag());
+        entityManager.AddComponentData(gameManagerEntity, new InitializeGameSystemsTag());
     }
 
     private void EnableMainMenuScreen()

@@ -1,141 +1,185 @@
 using Unity.Entities;
 
 [UpdateAfter(typeof(GameStartSystem))]
-public class StartLoadMenuSceneSystem : SystemBase
+public class StartLoadMenuSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
-        RequireSingletonForUpdate<LoadMenuSceneTag>();
+        RequireSingletonForUpdate<LoadMenuTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
-            WithName("StartLoadMenuSceneSystem").
-            WithAll<LoadMenuSceneTag>().
+            WithName("StartLoadMenuSystem").
+            WithAll<LoadMenuTag>().
             ForEach((Entity gameManagerEntity) =>
             {
-                ecb.RemoveComponent<LoadMenuSceneTag>(gameManagerEntity);
+                ecb.RemoveComponent<LoadMenuTag>(gameManagerEntity);
             }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartLoadMenuSystem");
     }
 }
 
-public class StartReloadMenuSceneSystem : SystemBase
+public class StartReloadMenuSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
-        RequireSingletonForUpdate<ReloadMenuSceneTag>();
+        RequireSingletonForUpdate<ReloadMenuTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
-            WithName("StartReloadMenuSceneSystem").
-            WithAll<ReloadMenuSceneTag>().
+            WithName("StartReloadMenuSystem").
+            WithAll<ReloadMenuTag>().
             ForEach((Entity gameManagerEntity) =>
             {
-                ecb.RemoveComponent<ReloadMenuSceneTag>(gameManagerEntity);
+                ecb.RemoveComponent<ReloadMenuTag>(gameManagerEntity);
             }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartReloadMenuSystem");
     }
 }
 
-public class StartLoadGameSceneSystem : SystemBase
+public class StartLoadGameSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
-        RequireSingletonForUpdate<LoadGameSceneTag>();
+        RequireSingletonForUpdate<LoadGameTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
-            WithName("StartLoadGameSceneSystem").
-            WithAll<LoadGameSceneTag>().
+            WithName("StartLoadGameSystem").
+            WithAll<LoadGameTag>().
             ForEach((Entity gameManagerEntity) =>
             {
-                ecb.RemoveComponent<LoadGameSceneTag>(gameManagerEntity);
+                ecb.RemoveComponent<LoadGameTag>(gameManagerEntity);
+                ecb.AddComponent<InGameTag>(gameManagerEntity);
             }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartLoadGameSystem");
+    }
+}
+
+public class StartReloadGameSystem : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<ReloadGameTag>();
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
+
+        Entities.
+            WithName("StartReloadGameSystem").
+            WithAll<ReloadGameTag>().
+            ForEach((Entity gameManagerEntity) =>
+            {
+                ecb.RemoveComponent<ReloadGameTag>(gameManagerEntity);
+                ecb.AddComponent<LoadGameTag>(gameManagerEntity);
+                ecb.AddComponent<InitializeGameSystemsTag>(gameManagerEntity);
+            }).Schedule();
+
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartReloadGameSystem");
     }
 }
 
 public class StartSpawnInitialObjects : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
-        
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
-        RequireSingletonForUpdate<InitializeSystemsTag>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<InitializeGameSystemsTag>();
+        RequireSingletonForUpdate<InGameTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
             WithName("StartSpawnInitialObjects").
-            WithAll<InitializeSystemsTag>().
+            WithAll<InitializeGameSystemsTag>().
             ForEach((Entity gameManagerEntity) =>
         {
-            ecb.RemoveComponent<InitializeSystemsTag>(gameManagerEntity);
+            ecb.RemoveComponent<InitializeGameSystemsTag>(gameManagerEntity);
             ecb.AddComponent<SpawnInitialObjectsTag>(gameManagerEntity);
         }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartSpawnInitialObjects");
     }
 }
 
 public class StartCreateInitialOperationsSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
         RequireSingletonForUpdate<SpawnInitialObjectsTag>();
         RequireSingletonForUpdate<IslandTag>();
         RequireSingletonForUpdate<CannonTag>();
+        RequireSingletonForUpdate<InGameTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
             WithName("StartCreateInitialOperationsSystem").
@@ -146,26 +190,29 @@ public class StartCreateInitialOperationsSystem : SystemBase
             ecb.AddComponent<CreateOperationsTag>(gameManagerEntity);
         }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartCreateInitialOperationsSystem");
     }
 }
 
 public class FinishCreateOperationsSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
         RequireSingletonForUpdate<CreateOperationsTag>();
+        RequireSingletonForUpdate<InGameTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
         var gameManagerEntity = GetSingletonEntity<GameManagerTag>();
         var operationsBuffer = GetBuffer<OperationAnswerBuffer>(gameManagerEntity);
 
@@ -175,31 +222,37 @@ public class FinishCreateOperationsSystem : SystemBase
             ecb.AddComponent<FinishedCreateOperationsTag>(gameManagerEntity);
         }
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("FinishCreateOperationsSystem");
     }
 }
 
 public class FinishSpawnTargetsSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
         RequireSingletonForUpdate<FinishedCreateOperationsTag>();
+        RequireSingletonForUpdate<InGameTag>();
         RequireForUpdate(GetEntityQuery(new EntityQueryDesc
         {
-            All = new [] {ComponentType.ReadOnly<TargetTag>()},
-            None = new [] {ComponentType.ReadOnly<TextMeshInternalData>()}
+            All = new[]
+            {
+                ComponentType.ReadOnly<TargetTag>()
+            },
+            None = new[] { ComponentType.ReadOnly<TextMeshInternalData>() }
         }));
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
             WithName("FinishSpawnTargetsSystem").
@@ -207,29 +260,33 @@ public class FinishSpawnTargetsSystem : SystemBase
             ForEach((Entity gameManagerEntity) =>
             {
                 ecb.AddComponent<FinishedSpawnTargetsTag>(gameManagerEntity);
+                ecb.AddComponent<UpdateLabelTag>(gameManagerEntity);
             }).Schedule();
-        
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("FinishSpawnTargetsSystem");
     }
 }
 
 public class StartGetPlayerActionsSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
         RequireSingletonForUpdate<FinishedCreateOperationsTag>();
         RequireSingletonForUpdate<FinishedSpawnTargetsTag>();
+        RequireSingletonForUpdate<InGameTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
             WithName("StartGetPlayerActionsSystem").
@@ -241,28 +298,31 @@ public class StartGetPlayerActionsSystem : SystemBase
 
                 ecb.AddComponent<GetPlayerActionsTag>(gameManagerEntity);
             }).Schedule();
-        
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartGetPlayerActionsSystem");
     }
 }
 
 public class StartFireCannonSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
         RequireSingletonForUpdate<GetPlayerActionsTag>();
+        RequireSingletonForUpdate<InGameTag>();
         RequireSingletonForUpdate<CannonballTag>();
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
             WithName("StartFireCannonSystem").
@@ -270,64 +330,122 @@ public class StartFireCannonSystem : SystemBase
             ForEach((Entity gameManagerEntity) =>
         {
             ecb.RemoveComponent<GetPlayerActionsTag>(gameManagerEntity);
-            ecb.AddComponent<FireCannonTag>(gameManagerEntity);
+            ecb.AddComponent<CannonFiredTag>(gameManagerEntity);
+            ecb.AddComponent<UpdateLabelTag>(gameManagerEntity);
         }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartFireCannonSystem");
+    }
+}
+
+public class StartUpdateUi : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _entityCommandBufferSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireForUpdate(GetEntityQuery(new EntityQueryDesc
+        {
+            All = new[] { ComponentType.ReadOnly<GameManagerTag>() },
+            Any = new[]
+            {
+                ComponentType.ReadOnly<CannonballHitOnIslandTag>(),
+                ComponentType.ReadOnly<CannonballMisshitTag>()
+            }
+        }));
+
+        RequireSingletonForUpdate<InGameTag>();
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
+
+        Entities.
+            WithName("StartUpdateUi").
+            WithAll<CannonFiredTag>().
+            ForEach((Entity gameManagerEntity) =>
+            {
+                ecb.RemoveComponent<CannonFiredTag>(gameManagerEntity);
+                ecb.AddComponent<UpdateUiTag>(gameManagerEntity);
+                ecb.AddComponent<UpdateLabelTag>(gameManagerEntity);
+            }).Schedule();
+
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartUpdateUi");
     }
 }
 
 public class StartUpdateObjectsPosition : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
-        RequireSingletonForUpdate<FireCannonTag>();
-        RequireSingletonForUpdate<CannonballHitOnIslandTag>();
+        RequireSingletonForUpdate<UpdateUiTag>();
+        RequireSingletonForUpdate<InGameTag>();
+
+        RequireForUpdate(GetEntityQuery(new EntityQueryDesc
+        {
+            All = new[] { ComponentType.ReadOnly<MenuManagerTag>() },
+            None = new[]
+            {
+                ComponentType.ReadOnly<UpdateLabelTag>(),
+                ComponentType.ReadOnly<Timer>()
+            }
+        }));
     }
 
     protected override void OnUpdate()
     {
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
             WithName("StartUpdateObjectsPosition").
-            WithAll<FireCannonTag>().
+            WithAll<UpdateUiTag>().
             ForEach((Entity gameManagerEntity) =>
         {
-            ecb.RemoveComponent<FireCannonTag>(gameManagerEntity);
+            ecb.RemoveComponent<UpdateUiTag>(gameManagerEntity);
             ecb.AddComponent<UpdateObjectsPositionTag>(gameManagerEntity);
         }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartUpdateObjectsPosition");
     }
 }
 
 public class StartCreateOperationsSystem : SystemBase
 {
-    private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
     private EntityQuery _targetQuery;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
-        _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
         _targetQuery = GetEntityQuery(ComponentType.ReadOnly<TargetTag>());
 
         RequireSingletonForUpdate<UpdateObjectsPositionTag>();
+        RequireSingletonForUpdate<InGameTag>();
     }
 
     protected override void OnUpdate()
     {
-        if (_targetQuery.CalculateEntityCount() != 0) return;
+        if (!_targetQuery.IsEmpty) return;
 
-        var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
 
         Entities.
             WithName("StartCreateOperationsSystem").
@@ -338,6 +456,44 @@ public class StartCreateOperationsSystem : SystemBase
                 ecb.AddComponent<CreateOperationsTag>(gameManagerEntity);
             }).Schedule();
 
-        _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("StartCreateOperationsSystem");
+    }
+}
+
+public class FinishGameCycleSystem : SystemBase
+{
+    private EndSimulationEntityCommandBufferSystem _entityCommandBufferSystem;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+
+        _entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
+
+        RequireSingletonForUpdate<UpdateObjectsPositionTag>();
+        RequireForUpdate(GetEntityQuery(new EntityQueryDesc
+        {
+            All = new[] { ComponentType.ReadOnly<GameManagerTag>() },
+            None = new[] { ComponentType.ReadOnly<InGameTag>() }
+        }));
+    }
+
+    protected override void OnUpdate()
+    {
+        var ecb = _entityCommandBufferSystem.CreateCommandBuffer();
+
+        Entities.
+            WithName("FinishGameCycleSystem").
+            WithAll<UpdateObjectsPositionTag>().
+            ForEach((Entity gameManagerEntity) =>
+            {
+                ecb.RemoveComponent<UpdateObjectsPositionTag>(gameManagerEntity);
+            }).Schedule();
+
+        _entityCommandBufferSystem.AddJobHandleForProducer(Dependency);
+
+        //UnityEngine.Debug.Log("FinishGameCycleSystem");
     }
 }

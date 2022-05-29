@@ -3,74 +3,6 @@
     "maps": [
         {
             "name": "Player",
-            "id": "04b9e582-7436-4283-ab7e-49e34a26a5ad",
-            "actions": [
-                {
-                    "name": "Fire",
-                    "type": "Button",
-                    "id": "5a02e406-c1f0-4179-9478-79965a31acf2",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "Look",
-                    "type": "PassThrough",
-                    "id": "d3f83eff-7f5a-42b6-8fbd-2dec434490c4",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": ""
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "ef5f6d09-13bc-441a-9e3c-cb83cea69f8b",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Mouse",
-                    "action": "Fire",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2b0f05df-1131-4074-90f9-8339abc55fb7",
-                    "path": "<Pointer>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Mouse;Touchscreen",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4123e19b-aaf0-4920-9651-0b34e511f5dd",
-                    "path": "<Gamepad>/leftStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "495de5bf-a9fa-4cef-a95a-f97841551cd8",
-                    "path": "<Touchscreen>/primaryTouch/tap",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Touch;Touchscreen",
-                    "action": "Fire",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "UI",
             "id": "8ee0411c-f380-4832-a14d-8ffc16819249",
             "actions": [
                 {
@@ -79,15 +11,17 @@
                     "id": "916fee25-2a54-4831-9596-f3d4c93b4d91",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
-                    "name": "Click",
+                    "name": "Fire",
                     "type": "PassThrough",
                     "id": "e4572f43-181d-4791-8aaf-1f4090ed64bc",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Touch",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -98,62 +32,29 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Mouse",
-                    "action": "Click",
+                    "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "d0031a5b-ffb2-4675-bc5b-cd7aff7a610d",
-                    "path": "<Touchscreen>/touch*/press",
+                    "id": "0220ffbc-3c02-41be-ab5d-d7d1ca6d8062",
+                    "path": "<Touchscreen>/primaryTouch/tap",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Touch;Touchscreen",
-                    "action": "Click",
+                    "groups": "Touchscreen;Mouse",
+                    "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "8336a257-12d5-461d-a2ed-ef456191a732",
-                    "path": "<Mouse>/position",
+                    "id": "3984a2ba-5c5f-477a-a991-fb83c70cb5d1",
+                    "path": "<Pointer>/delta",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Mouse",
+                    "groups": "Mouse;Touchscreen",
                     "action": "Point",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "dc95d744-70e6-42cb-9e88-5d4bec4ba02d",
-                    "path": "<Pen>/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Mouse",
-                    "action": "Point",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "259c2b55-b51e-43a3-ac77-e59a16192f66",
-                    "path": "<Touchscreen>/touch*/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Touch;Touchscreen",
-                    "action": "Point",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "370f41bf-1917-4565-9d64-2ff1ce5c708c",
-                    "path": "<Pen>/tip",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Mouse",
-                    "action": "Click",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

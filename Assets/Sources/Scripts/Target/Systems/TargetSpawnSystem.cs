@@ -2,12 +2,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics.Systems;
 using Unity.Transforms;
-using UnityEngine;
-
-public struct TextMeshInternalData : IComponentData
-{
-    public int TextValue;
-}
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(BuildPhysicsWorld))]
@@ -25,8 +19,9 @@ public class TargetSpawnSystem : SystemBase
         var currentWorld = World.DefaultGameObjectInjectionWorld;
         _entityManager = currentWorld.EntityManager;
         _endFixedStepSimulationEntityCommandBuffer = currentWorld.GetOrCreateSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
-        
+
         RequireSingletonForUpdate<FinishedCreateOperationsTag>();
+        RequireSingletonForUpdate<InGameTag>();
         RequireSingletonForUpdate<TargetPrefabConversion>();
     }
 
@@ -63,56 +58,10 @@ public class TargetSpawnSystem : SystemBase
                     {
                         ecb.AddComponent(newTarget, new IsCorrectTag());
                     }
-
                 }
 
                 operations.Clear();
             }).Schedule();
-
-        _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(Dependency);
-    }
-
-    protected override void OnDestroy()
-    {
-        _entityManager.RemoveComponent<TargetPrefabConversion>(_entityManager
-            .CreateEntityQuery(typeof(TargetPrefabConversion))
-            .ToEntityArray(Allocator.Temp));
-    }
-}
-
-[UpdateInGroup(typeof(LateSimulationSystemGroup))]
-[UpdateAfter(typeof(TargetSpawnSystem))]
-public class UpdateTargetDataSystem : SystemBase
-{
-    private EntityQuery _targetQuery;
-    private EntityManager _entityManager;
-    private EndFixedStepSimulationEntityCommandBufferSystem _endFixedStepSimulationEntityCommandBuffer;
-
-    protected override void OnCreate()
-    {
-        base.OnCreate();
-
-        var currentWorld = World.DefaultGameObjectInjectionWorld;
-        _entityManager = currentWorld.EntityManager;
-        _targetQuery = _entityManager.CreateEntityQuery(typeof(TargetTag), typeof(TextMeshInternalData));
-        _endFixedStepSimulationEntityCommandBuffer = currentWorld.GetOrCreateSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
-
-        RequireForUpdate(_targetQuery);
-    }
-
-    protected override void OnUpdate()
-    {
-        var ecb = _endFixedStepSimulationEntityCommandBuffer.CreateCommandBuffer();
-
-        using var targetEntities = _targetQuery.ToEntityArray(Allocator.Temp);
-        foreach (var targetEntity in targetEntities)
-        {
-            var textMeshEntity = GetBuffer<LinkedEntityGroup>(targetEntity)[3].Value;
-            var textValue = GetComponent<TextMeshInternalData>(targetEntity).TextValue;
-            var tmp = _entityManager.GetComponentObject<TextMesh>(textMeshEntity).text = $"{textValue}";
-
-            ecb.RemoveComponent<TextMeshInternalData>(targetEntity);
-        }
 
         _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(Dependency);
     }

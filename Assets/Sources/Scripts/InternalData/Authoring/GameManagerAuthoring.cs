@@ -10,11 +10,23 @@ public class GameManagerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
             {
                 typeof(GameManagerTag),
                 typeof(OperationAnswerBuffer),
-                typeof(PlayerScoreBuffer),
-                typeof(GameStartData),
-                typeof(LoadMenuSceneTag),
-                typeof(GameStateData)
+                typeof(PlayerTimeBuffer),
+                typeof(PlayerGameplayData),
+                typeof(LoadMenuTag),
+                typeof(Chronometer)
             }
         ));
+
+        dstManager.AddComponentData(entity, new GameStartData
+        {
+            Mode = GameMode.SumOrSubstract,
+            Difficulty = GameDifficulty.Easy
+        });
+
+        dstManager.AddComponentData(entity, new ChronometerData
+        {
+            Action = ChronometerAction.StandBy,
+            PenaltyAmountTime = 10
+        });
     }
 }

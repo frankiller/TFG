@@ -22,14 +22,13 @@ public class CannonShootSystem : SystemBase
 
         Entities.
             WithName("CannonShootSystem").
-            ForEach(
-                (Entity entity, int entityInQueryIndex, ref PhysicsVelocity physicsVelocity, in CannonShootData cannonShootData) =>
-                {
-                    physicsVelocity.Linear = math.normalize(cannonShootData.Direction) * cannonShootData.Force;
+            ForEach((Entity entity, int entityInQueryIndex, ref PhysicsVelocity physicsVelocity, in CannonShootData cannonShootData) =>
+            {
+                physicsVelocity.Linear = math.normalize(cannonShootData.Direction) * cannonShootData.Force;
 
-                    ecb.RemoveComponent<CannonShootData>(entityInQueryIndex, entity);
+                ecb.RemoveComponent<CannonShootData>(entityInQueryIndex, entity);
 
-                }).ScheduleParallel();
+            }).ScheduleParallel();
 
         _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(Dependency);
     }

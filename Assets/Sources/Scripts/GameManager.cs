@@ -7,22 +7,18 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField] private float delay = 2f;
-    [SerializeField] private UIDocument _menuUI;
-    [SerializeField] private UIDocument _gameUI;
+    [SerializeField] private float delay = 2.5f;
+    [SerializeField] private UIDocument _menuUi;
+    [SerializeField] private UIDocument _gameUi;
+    [SerializeField] private UIDocument _pauseGameUi;
+    [SerializeField] private UIDocument _finishedGameUi;
+    [SerializeField] private CanvasGroup _canvasGroup;
 
-    public UIDocument MenuUI
-    {
-        get => _menuUI;
-        set => value = _menuUI;
-    }
-
-    public UIDocument GameUI
-    {
-        get => _gameUI;
-        set => value = _gameUI;
-    }
-
+    public UIDocument MenuUi => _menuUi;
+    public UIDocument GameUi => _gameUi;
+    public UIDocument PauseGameUi => _pauseGameUi;
+    public UIDocument FinishedGameUi => _finishedGameUi;
+    public CanvasGroup ScreenControlsCanvasGroup => _canvasGroup;
 
     private void Awake()
     {

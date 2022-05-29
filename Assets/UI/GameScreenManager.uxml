@@ -1,9 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Template name="GameScreen" src="GameScreen.uxml" />
-    <ui:Template name="GamePauseScreen" src="GamePauseScreen.uxml" />
     <Style src="FluffyMenus.uss" />
     <GameScreenManager style="flex-grow: 1;">
         <ui:Instance template="GameScreen" name="GameScreen" style="flex-grow: 1; display: none;" />
-        <ui:Instance template="GamePauseScreen" name="GamePauseScreen" style="display: none; height: 516px; width: 494px;" />
     </GameScreenManager>
 </ui:UXML>

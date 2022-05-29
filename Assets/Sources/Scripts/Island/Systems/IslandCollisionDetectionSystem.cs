@@ -17,6 +17,10 @@ public class IslandCollisionDetectionSystem : JobComponentSystem
     protected override void OnCreate()
     {
         base.OnCreate();
+
+        RequireSingletonForUpdate<CannonFiredTag>();
+        RequireSingletonForUpdate<InGameTag>();
+
         _buildPhysicsWorld = World.GetOrCreateSystem<BuildPhysicsWorld>();
         _stepPhysicsWorld = World.GetOrCreateSystem<StepPhysicsWorld>();
 
@@ -24,36 +28,47 @@ public class IslandCollisionDetectionSystem : JobComponentSystem
     }
 
     [BurstCompile]
-    struct IslandCollisionDetectionSystemJob : ICollisionEventsJob
+    private struct IslandCollisionDetectionSystemJob : ICollisionEventsJob
     {
         [ReadOnly] public ComponentDataFromEntity<IslandTag> IslandGroup;
         [ReadOnly] public ComponentDataFromEntity<CannonballTag> CannonballGroup;
         [ReadOnly] public ComponentDataFromEntity<CannonballHitOnIslandTag> CannonballOnGroundGroup;
+        [ReadOnly] public PhysicsWorld PhysicsWorld;
+
+        public ComponentDataFromEntity<AnswerLabelData> CorrectAnswerLabelDataGroup;
 
         public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
+        public Entity GameManagerEntity;
+        public Entity MenuManagerEntity;
 
         public void Execute(CollisionEvent collisionEvent)
         {
             var entityA = collisionEvent.EntityA;
             var entityB = collisionEvent.EntityB;
 
-            bool entityAIsCannonball = CannonballGroup.HasComponent(entityA);
-            bool entityAIsIsland = IslandGroup.HasComponent(entityA);
-            bool entityAIsProcessed = CannonballOnGroundGroup.HasComponent(entityA);
-            
-            bool entityBIsCannonball = CannonballGroup.HasComponent(entityB);
-            bool entityBIsIsland = IslandGroup.HasComponent(entityB);
-            bool entityBIsProcessed = CannonballOnGroundGroup.HasComponent(entityB);
+            var entityAIsCannonball = CannonballGroup.HasComponent(entityA);
+            var entityAIsProcessed = CannonballOnGroundGroup.HasComponent(GameManagerEntity);
 
-            if (entityAIsCannonball && entityBIsIsland && !entityAIsProcessed)
+            var entityBIsIsland = IslandGroup.HasComponent(entityB);
+
+            if (!entityAIsCannonball || !entityBIsIsland || entityAIsProcessed) return;
+
+            var answerLabel = CorrectAnswerLabelDataGroup[MenuManagerEntity];
+
+            if (collisionEvent.CalculateDetails(ref PhysicsWorld).AverageContactPointPosition.y < 1f)
             {
-                EntityCommandBuffer.AddComponent(entityA.Index, entityA, new CannonballHitOnIslandTag());
+                EntityCommandBuffer.AddComponent<CannonballMisshitTag>(GameManagerEntity.Index, GameManagerEntity);
+                answerLabel.Type = AnswerType.Incorrect;
+                
+            }
+            else
+            {
+                EntityCommandBuffer.AddComponent<CannonballHitOnIslandTag>(GameManagerEntity.Index, GameManagerEntity);
+                answerLabel.Type = AnswerType.Correct;
             }
 
-            if (entityBIsCannonball && entityAIsIsland && !entityBIsProcessed)
-            {
-                UnityEngine.Debug.Log("Entity A is ground and Entity B is cannonball");
-            }
+            EntityCommandBuffer.SetComponent(MenuManagerEntity.Index, MenuManagerEntity, answerLabel);
+            EntityCommandBuffer.AddComponent(MenuManagerEntity.Index, MenuManagerEntity, new Timer(answerLabel.SecondsVisible));
         }
     }
 
@@ -64,11 +79,15 @@ public class IslandCollisionDetectionSystem : JobComponentSystem
             IslandGroup = GetComponentDataFromEntity<IslandTag>(true),
             CannonballGroup = GetComponentDataFromEntity<CannonballTag>(true),
             CannonballOnGroundGroup = GetComponentDataFromEntity<CannonballHitOnIslandTag>(true),
-            EntityCommandBuffer = _endFixedStepSimulationEntityCommandBuffer.CreateCommandBuffer().AsParallelWriter()
+            CorrectAnswerLabelDataGroup = GetComponentDataFromEntity<AnswerLabelData>(),
+            EntityCommandBuffer = _endFixedStepSimulationEntityCommandBuffer.CreateCommandBuffer().AsParallelWriter(),
+            GameManagerEntity = GetSingletonEntity<GameManagerTag>(),
+            MenuManagerEntity = GetSingletonEntity<MenuManagerTag>(),
+            PhysicsWorld = _buildPhysicsWorld.PhysicsWorld
         };
-        
+
         var jobHandle = job.Schedule(_stepPhysicsWorld.Simulation, ref _buildPhysicsWorld.PhysicsWorld, inputDeps);
-        
+
         _buildPhysicsWorld.AddInputDependencyToComplete(jobHandle);
 
         _endFixedStepSimulationEntityCommandBuffer.AddJobHandleForProducer(jobHandle);

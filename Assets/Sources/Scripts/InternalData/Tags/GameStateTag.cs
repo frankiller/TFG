@@ -2,27 +2,16 @@ using System;
 using Unity.Entities;
 
 [Serializable]
-public enum GameState
-{
-    LoadMenuScene,
-    InitializeSystemsTag,
-    SpawnInitialObjects,
-    CreateOperations,
-    FinishedCreateOperations,
-    FinishedSpawnTargets,
-    GetPlayerActions,
-    FireCannon,
-    CannonballHitOnIsland
-}
+public struct LoadMenuTag : IComponentData { }
 
 [Serializable]
-public struct GameStateData : IComponentData
-{
-    public GameState Value;
-}
+public struct LoadGameTag : IComponentData { }
 
 [Serializable]
-public struct InitializeSystemsTag : IComponentData { }
+public struct InitializeGameSystemsTag : IComponentData { }
+
+[Serializable]
+public struct InGameTag : IComponentData { }
 
 [Serializable]
 public struct SpawnInitialObjectsTag : IComponentData { }
@@ -40,22 +29,29 @@ public struct FinishedSpawnTargetsTag : IComponentData { }
 public struct GetPlayerActionsTag : IComponentData { }
 
 [Serializable]
-public struct FireCannonTag : IComponentData { }
+public struct CannonFiredTag : IComponentData { }
 
 [Serializable]
 public struct CannonballHitOnIslandTag : IComponentData { }
 
 [Serializable]
+public struct CannonballMisshitTag : IComponentData { }
+
+[Serializable]
+public struct UpdateUiTag : IComponentData { }
+
+[Serializable]
+public struct UpdateLabelTag : IComponentData { }
+
+[Serializable]
 public struct UpdateObjectsPositionTag : IComponentData { }
 
 [Serializable]
+public struct ReloadMenuTag : IComponentData { }
+
+[Serializable]
+public struct ReloadGameTag : IComponentData { }
+
+/////////////
+[Serializable]
 public struct DeactivateSystemsTag : IComponentData { }
-
-[Serializable]
-public struct LoadMenuSceneTag : IComponentData { }
-
-[Serializable]
-public struct LoadGameSceneTag : IComponentData { }
-
-[Serializable]
-public struct ReloadMenuSceneTag : IComponentData { }

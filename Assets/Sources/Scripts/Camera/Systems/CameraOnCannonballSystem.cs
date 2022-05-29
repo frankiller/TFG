@@ -11,6 +11,7 @@ public class CameraOnCannonballSystem : SystemBase
         _endFixedStepSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndFixedStepSimulationEntityCommandBufferSystem>();
 
         RequireSingletonForUpdate<GetPlayerActionsTag>();
+        RequireSingletonForUpdate<InGameTag>();
         RequireSingletonForUpdate<CannonballTag>();
     }
 

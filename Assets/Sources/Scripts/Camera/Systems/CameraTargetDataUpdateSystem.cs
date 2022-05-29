@@ -4,16 +4,11 @@ using Unity.Transforms;
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateBefore(typeof(CameraPositionSystem))]
-[UpdateBefore(typeof(CameraRotationSystem))]
 public class CameraTargetDataUpdateSystem : SystemBase
 {
-    private EntityManager _entityManager;
-
     protected override void OnCreate()
     {
         base.OnCreate();
-
-        _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         RequireSingletonForUpdate<CameraTargetEntityData>();
     }
@@ -22,10 +17,10 @@ public class CameraTargetDataUpdateSystem : SystemBase
     {
         var targetEntity = GetSingleton<CameraTargetEntityData>();
 
-        if (!_entityManager.Exists(targetEntity.Value)) return;
+        if (!EntityManager.Exists(targetEntity.Value)) return;
 
-        var localToWorld = _entityManager.GetComponentData<LocalToWorld>(targetEntity.Value);
-        _entityManager.SetComponentData(GetSingletonEntity<CameraTag>(), new CameraTargetData
+        var localToWorld = EntityManager.GetComponentData<LocalToWorld>(targetEntity.Value);
+        EntityManager.SetComponentData(GetSingletonEntity<CameraTag>(), new CameraTargetData
         {
             Position = localToWorld.Position,
             Rotation = localToWorld.Rotation,

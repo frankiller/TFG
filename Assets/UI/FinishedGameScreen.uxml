@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="FluffyMenus.uss" />
+    <FinishedGameScreen class="screen" style="flex-grow: 1;">
+        <ui:VisualElement name="FinishedGameScreen" class="screen-background screen" style="display: none;">
+            <ui:VisualElement name="menu-center-container" class="menu-center-panel menu-background">
+                <ui:VisualElement name="logo-container" style="background-image: url(&apos;/Assets/UI/Graphics/FluffyChickenLogo.png&apos;); width: 200px; height: 200px; padding-left: 1px; padding-right: 2px; -unity-font: url(&apos;/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf&apos;); -unity-font-definition: none; font-size: 50px; color: rgb(255, 175, 50); white-space: nowrap; -unity-text-align: middle-center; -unity-text-outline-width: 4px; -unity-text-outline-color: rgb(200, 25, 25); text-shadow: 2px 1px 1px rgb(200, 25, 25); letter-spacing: 15px; bottom: 50px;">
+                    <ui:Label text="PARTIDA FINALIZADA" name="label-end-game" style="font-size: 50px; width: 375px; right: 85px; top: 175px; -unity-text-outline-width: 2px; white-space: normal;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="button-container" style="margin-top: 25px; top: 80px;">
+                    <ui:Button text="Reintentar" name="button-retry" class="menu-button menu-button-top" style="display: none;" />
+                    <ui:Button text="Nueva dificultad" display-tooltip-when-elided="true" name="button-difficulty" class="menu-button menu-button-middle" />
+                    <ui:Button text="Volver al menú" display-tooltip-when-elided="true" name="button-exit" class="menu-button menu-button-bottom" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </FinishedGameScreen>
+</ui:UXML>

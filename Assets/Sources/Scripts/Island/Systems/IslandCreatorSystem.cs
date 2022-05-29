@@ -13,18 +13,18 @@ public class IslandCreatorSystem : SystemBase
 
         _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
-        RequireForUpdate(GetEntityQuery(ComponentType.ReadOnly<PositionPredictionData>()));
+        RequireSingletonForUpdate<TrajectoryPredictionData>();
     }
 
     protected override void OnUpdate()
     {
-        var islandPrefabData =  GetSingleton<IslandPrefabData>();
-        UnityEngine.Debug.Log($"IslandCreatorSystem -> {islandPrefabData.NextPrefabIndex} - {islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[islandPrefabData.NextPrefabIndex].Value}");
-
         var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
+        var islandPrefabData =  GetSingleton<IslandPrefabData>();
         var islandSpawnerEntity = GetSingletonEntity<IslandSpawnerTag>();
         var islandSpawnOffset = GetSingleton<IslandSpawnOffsetAuthoring>().Value;
+
         //var random = new Random(1).NextInt(0, islandPrefabData.BlobAssetReference.Value.IslandPrefabBuffer.Length);
+
         var islandPrefab = islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[islandPrefabData.NextPrefabIndex].Value;
         var cannonPosition = islandPrefabData.BlobAssetReference.Value.IslandPrefabArray[islandPrefabData.NextPrefabIndex].CannonPosition;
 
@@ -32,7 +32,7 @@ public class IslandCreatorSystem : SystemBase
 
         Entities.
             WithName("IslandCreatorSystem").
-            ForEach((Entity entity, in PositionPredictionData positionPredictionData) =>
+            ForEach((Entity entity, in TrajectoryPredictionData positionPredictionData) =>
             {
                 var newPosition = positionPredictionData.Value - islandSpawnOffset;
                 ecb.AddComponent(islandSpawnerEntity, new IslandSpawnSettings
@@ -44,39 +44,39 @@ public class IslandCreatorSystem : SystemBase
 
                 ecb.AddComponent(islandSpawnerEntity, new CannonPositionData { Value = cannonPosition + newPosition });
 
-                ecb.RemoveComponent<PositionPredictionData>(entity);
+                ecb.RemoveComponent<TrajectoryPredictionData>(entity);
         }).Schedule();
 
         _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
     }
 }
 
-public class UpdateIslandPrefabToSpawnSystem : SystemBase
+public class UpdateIslandNextPrefabSystem : SystemBase
 {
     private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
+        
         _endSimulationEntityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
 
-        RequireForUpdate(GetEntityQuery(ComponentType.ReadOnly<PositionPredictionData>()));
+        RequireSingletonForUpdate<TrajectoryPredictionData>();
     }
 
     protected override void OnUpdate()
     {
         var ecb = _endSimulationEntityCommandBufferSystem.CreateCommandBuffer();
         var islandPrefabData = GetSingleton<IslandPrefabData>();
-        //var random = ;
 
         Entities.
             WithChangeFilter<IslandSpawnSettings>().
             ForEach((Entity e) =>
-        {
-            islandPrefabData.NextPrefabIndex = new Random(1).NextInt(0, islandPrefabData.BlobAssetReference.Value.IslandPrefabArray.Length);
+            {
+                islandPrefabData.NextPrefabIndex = new Random(1).NextInt(0, islandPrefabData.BlobAssetReference.Value.IslandPrefabArray.Length);
 
-            ecb.SetComponent(e, islandPrefabData);
-        }).Schedule();
+                ecb.SetComponent(e, islandPrefabData);
+            }).Schedule();
 
         _endSimulationEntityCommandBufferSystem.AddJobHandleForProducer(Dependency);
     }

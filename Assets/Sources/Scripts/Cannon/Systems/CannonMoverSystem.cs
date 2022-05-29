@@ -8,15 +8,12 @@ using UnityEngine;
 [UpdateAfter(typeof(EndFramePhysicsSystem))]
 public class CannonMoverSystem : SystemBase
 {
-    private EntityManager _entityManager;
-
     private float _turnSpeed;
     private float _acceleration;
     private float _maxVerticalAngle;
     private float _inputLagPeriod;
-
     private float _inputLagTimer;
-    
+
     private float _lastXInputEvent;
     private float _lastYInputEvent;
 
@@ -32,28 +29,27 @@ public class CannonMoverSystem : SystemBase
         base.OnCreate();
 
         RequireSingletonForUpdate<GetPlayerActionsTag>();
+        RequireSingletonForUpdate<InGameTag>();
         RequireSingletonForUpdate<RawInputData>();
     }
 
     protected override void OnStartRunning()
     {
-        _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-        var inputVariables = GetComponent<InputVariables>(GetSingletonEntity<InputVariables>());
+        var inputVariables = GetComponent<CannonInputData>(GetSingletonEntity<CannonInputData>());
         _turnSpeed = inputVariables.TurnSpeed;
-        _acceleration = inputVariables.Acceleration;
-        _maxVerticalAngle = inputVariables.MaxVerticalAngle;
-        _inputLagPeriod = inputVariables.InputLagPeriod;
+        _acceleration = inputVariables.TurnAcceleration;
+        _maxVerticalAngle = inputVariables.TurnMaxVerticalAngle;
+        _inputLagPeriod = inputVariables.TurnInputLagPeriod;
 
         _currentYVelocity = 0f;
         _currentXVelocity = 0f;
-        
+
         _lastXInputEvent = 0f;
         _lastYInputEvent = 0f;
 
         _inputLagTimer = 0f;
 
-        var barrelRotation = CannonHelper.GetCannonBarrelRotation(_entityManager).value;
+        var barrelRotation = CannonHelper.GetCannonBarrelRotation(EntityManager).value;
         _currentXEulerRotation = new Quaternion(barrelRotation.x, barrelRotation.y, barrelRotation.z, barrelRotation.w).eulerAngles.x;
 
         if (_currentXEulerRotation >= 180)
@@ -63,7 +59,7 @@ public class CannonMoverSystem : SystemBase
 
         _currentXEulerRotation = ClampVerticalAngle(_currentXEulerRotation);
 
-        _currentYRotation = CannonHelper.GetCannonBarrelRotation(_entityManager).value.y;
+        _currentYRotation = CannonHelper.GetCannonBarrelRotation(EntityManager).value.y;
         _currentXRotation = _currentXEulerRotation;
     }
 
@@ -71,25 +67,36 @@ public class CannonMoverSystem : SystemBase
     {
         var rawInputData = GetSingleton<RawInputData>();
         var yRotation = GetYRotationToMouse(GetYInput(rawInputData.XInput));
-        
-        var baseEntity = CannonHelper.GetCannonBase(_entityManager);
-        var fromRotation = _entityManager.GetComponentData<Rotation>(baseEntity).Value;
-        var toRotation = quaternion.Euler(0f, yRotation, 0f);
-        _entityManager.SetComponentData(baseEntity, new Rotation { Value = Quaternion.Lerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
 
-        var barrelEntity = CannonHelper.GetCannonBarrel(_entityManager);
-        fromRotation = _entityManager.GetComponentData<Rotation>(barrelEntity).Value;
+        var baseEntity = CannonHelper.GetCannonBase(EntityManager);
+        var fromRotation = EntityManager.GetComponentData<Rotation>(baseEntity).Value;
+        var toRotation = quaternion.Euler(0f, yRotation, 0f);
+
+        EntityManager.SetComponentData(baseEntity, new Rotation { Value = math.nlerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
+
+        var barrelEntity = CannonHelper.GetCannonBarrel(EntityManager);
+        fromRotation = EntityManager.GetComponentData<Rotation>(barrelEntity).Value;
         toRotation = quaternion.Euler(GetXRotationToMouse(GetXInput(rawInputData.YInput)), yRotation, 0f);
-        _entityManager.SetComponentData(barrelEntity, new Rotation { Value = Quaternion.Lerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
+
+        EntityManager.SetComponentData(barrelEntity, new Rotation { Value = math.nlerp(fromRotation, toRotation, Time.DeltaTime * 5f)});
+
+        //Esto no tiene sentido. Buscar una forma de coger el input distinta
+        rawInputData.XInput = 0f;
+        rawInputData.YInput = 0f;
+        EntityManager.SetComponentData(GetSingletonEntity<GameManagerTag>(), rawInputData);
     }
 
     private float GetXInput(float xInput)
     {
         _inputLagTimer += Time.DeltaTime;
 
+        //UnityEngine.Debug.Log($"yInput {xInput}");
+
         if (Mathf.Approximately(0, xInput) && !(_inputLagTimer >= _inputLagPeriod)) return _lastXInputEvent;
         _lastXInputEvent = xInput;
         _inputLagTimer = 0f;
+
+        //UnityEngine.Debug.Log($"_lastXInputEvent: {_lastXInputEvent}");
 
         return _lastXInputEvent;
     }
@@ -98,9 +105,13 @@ public class CannonMoverSystem : SystemBase
     {
         _inputLagTimer += Time.DeltaTime;
 
+        //UnityEngine.Debug.Log($"yInput {yInput}");
+
         if (Mathf.Approximately(0, yInput) && !(_inputLagTimer >= _inputLagPeriod)) return _lastYInputEvent;
         _lastYInputEvent = yInput;
         _inputLagTimer = 0f;
+
+        //UnityEngine.Debug.Log($"_lastYInputEvent: {_lastYInputEvent}");
 
         return _lastYInputEvent;
     }

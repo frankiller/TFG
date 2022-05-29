@@ -8,10 +8,10 @@
 
 .menu-center-panel {
     height: 100%;
-    width: 50%;
+    width: 75%;
     align-items: center;
     justify-content: center;
-    left: 25%;
+    left: 13%;
 }
 
 .menu-background {
@@ -28,12 +28,12 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 50px;
+    height: 75px;
     margin-left: 1px;
     margin-right: 1px;
     margin-top: 10px;
     margin-bottom: 10px;
-    font-size: 30px;
+    font-size: 50px;
     color: rgb(200, 25, 25);
     background-color: rgb(255, 175, 50);
     border-left-color: rgb(0, 0, 0);
@@ -50,8 +50,9 @@
     background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
     text-shadow: 2px 1px 1px rgb(0, 0, 0);
     -unity-background-image-tint-color: rgb(254, 255, 250);
-    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
-    -unity-font-definition: resource('');
+    -unity-font: none;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
 }
 
 .menu-button:hover {
@@ -91,8 +92,7 @@
 }
 
 .label-override > .unity-base-field__label {
-    -unity-font-definition: none;
-    font-size: 30px;
+    font-size: 50px;
     color: rgb(200, 25, 25);
     background-color: rgb(255, 175, 50);
     -unity-text-outline-width: 1px;
@@ -105,16 +105,16 @@
     background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
     text-shadow: 2px 1px 1px rgb(0, 0, 0);
     width: 100%;
-    height: 50px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
+    height: 70px;
+    margin-top: 30px;
+    margin-bottom: 30px;
     -unity-text-align: middle-center;
     -unity-background-image-tint-color: rgb(255, 255, 255);
     border-left-color: rgb(0, 0, 0);
     border-right-color: rgb(0, 0, 0);
     border-top-color: rgb(0, 0, 0);
     border-bottom-color: rgb(0, 0, 0);
+    -unity-font-style: bold;
 }
 
 .label-override:hover > .unity-label:hover {
@@ -155,13 +155,12 @@
 
 .label {
     color: rgb(200, 25, 25);
-    -unity-font-definition: none;
     -unity-text-align: middle-center;
     -unity-text-outline-width: 1px;
     text-shadow: 2px 1px 1px rgb(0, 0, 0);
     font-size: 30px;
-    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
     -unity-text-outline-color: rgb(0, 0, 0);
+    -unity-font-style: bold;
 }
 
 .foldout {
@@ -212,24 +211,23 @@
 }
 
 .popup-field-text-override .unity-base-popup-field__text {
-    -unity-font-definition: none;
-    font-size: 20px;
+    font-size: 50px;
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgb(0, 0, 0);
     text-shadow: 2px 1px 1px rgb(0, 0, 0);
-    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
     -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    color: rgb(200, 25, 25);
 }
 
 .popup-field-label-override .unity-base-field__label {
-    -unity-font-definition: none;
-    font-size: 30px;
-    color: rgb(200, 25, 25);
+    font-size: 40px;
+    color: rgb(255, 244, 214);
     -unity-text-outline-color: rgb(0, 0, 0);
     text-shadow: 2px 1px 1px rgb(0, 0, 0);
     -unity-text-outline-width: 1px;
-    -unity-font: url('/Assets/AssetStorePackages/GUI PRO Kit - Casual Game/ResourcesData/Fonts/LilitaOne-Regular.ttf');
     -unity-text-align: middle-center;
+    -unity-font-style: bold;
 }
 
 .button-control {
@@ -254,4 +252,35 @@
     margin-right: 30px;
     margin-top: 30px;
     margin-bottom: 30px;
+}
+
+.screen-display-none {
+    flex-grow: 1;
+    display: none;
+}
+
+.toggle-override .unity-toggle__input {
+    background-color: rgb(255, 175, 50);
+    -unity-font-style: bold;
+    color: rgba(200, 25, 25, 255);
+    font-size: 20px;
+    -unity-text-align: middle-center;
+    background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.toggle-checked-override .unity-toggle__input:checked {
+    background-color: rgb(255, 175, 50);
+    background-image: url('/Assets/AssetStorePackages/Low Poly Vegetation Pack/Vegetation Assets/Textures/GrassPlane_a_04.psd');
+    -unity-background-scale-mode: scale-and-crop;
+    -unity-background-image-tint-color: rgba(200, 25, 25, 255);
+    -unity-font-style: bold;
+    font-size: 20px;
+    color: rgb(255, 244, 214);
+}
+
+.toggle-override-checkmark .unity-toggle__checkmark {
+    background-image: none;
+    width: 0;
+    height: 0;
 }

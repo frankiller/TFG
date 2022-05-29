@@ -20,25 +20,18 @@
         "UnityEngine.UIElementsModule",
         "UnityEditor.UIElementsModule",
         "Unity.InputSystem",
-        "UnityEngine.UIElementsInputSystemModule"
+        "UnityEngine.UIElementsInputSystemModule",
+        "DOTween.Modules",
+        "Unity.TextMeshPro"
     ],
-    "includePlatforms": [],
-    "excludePlatforms": [
-        "CloudRendering",
-        "GameCoreScarlett",
-        "GameCoreXboxOne",
-        "iOS",
-        "LinuxStandalone64",
-        "Lumin",
-        "macOSStandalone",
-        "PS4",
-        "PS5",
-        "Stadia",
-        "Switch",
-        "tvOS",
-        "WebGL",
-        "XboxOne"
+    "includePlatforms": [
+        "Android",
+        "Editor",
+        "WSA",
+        "WindowsStandalone32",
+        "WindowsStandalone64"
     ],
+    "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],

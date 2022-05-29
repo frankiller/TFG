@@ -14,7 +14,7 @@ public abstract class SpawnObjectAuthoringBase<T> : MonoBehaviour, IConvertGameO
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
-        dstManager.SetName(entity, $"{name}");
+        //dstManager.SetName(entity, $"{name}");
 
         var spawnSettings = new T
         {

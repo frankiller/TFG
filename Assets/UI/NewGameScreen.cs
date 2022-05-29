@@ -18,7 +18,7 @@ public class NewGameScreen : VisualElement
         _gameModeDropdown = this.Q<DropdownField>("dropdown-game-mode");
         _gameDifficultyDropdown = this.Q<DropdownField>("dropdown-game-difficulty");
 
-        this.Q("button-play")?.RegisterCallback<ClickEvent>(e => EnablePlayGame());
+        this.Q("button-play")?.RegisterCallback<ClickEvent>(_ => EnablePlayGame());
 
         UnregisterCallback<GeometryChangedEvent>(OnGeometryChange);
     }
@@ -28,7 +28,7 @@ public class NewGameScreen : VisualElement
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         var gameManagerEntityQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameManagerTag>());
 
-        if (gameManagerEntityQuery.IsEmptyIgnoreFilter) return;
+        if (gameManagerEntityQuery.IsEmpty) return;
 
         var gameManagerEntity = gameManagerEntityQuery.GetSingletonEntity();
         entityManager.AddComponentData(gameManagerEntity, new GameStartData
@@ -37,6 +37,6 @@ public class NewGameScreen : VisualElement
             Difficulty = (GameDifficulty) _gameDifficultyDropdown.index
         });
 
-        entityManager.AddComponentData(gameManagerEntity, new InitializeSystemsTag());
+        entityManager.AddComponentData(gameManagerEntity, new InitializeGameSystemsTag());
     }
 }
